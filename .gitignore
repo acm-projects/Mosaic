@@ -29,6 +29,7 @@ yarn-error.*
 # macOS
 .DS_Store
 *.pem
+*.plist
 
 # local env files
 .env*.local
@@ -41,3 +42,5 @@ app-example
 # generated native folders
 /ios
 /android
+
+google-services.json
