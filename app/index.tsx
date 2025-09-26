@@ -1,177 +1,242 @@
-import { MosaicLogo } from '@/components/mosaic_logo'; // ✅ import your logo
-import React, { useMemo, useState } from 'react';
-import { Dimensions, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import GoogleSVG from '@/assets/svg/google.svg';
+import { MosaicLogo } from '@/components/mosaic_logo';
+import { TwinklingStar } from '@/components/twinkle_star';
+import { LinearGradient } from 'expo-linear-gradient';
+import { MotiText, MotiView } from 'moti';
+import { useMemo, useState } from "react";
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Easing } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-interface LoginScreenProps {
-  onLogin: (isNewUser?: boolean) => void;
-}
+export default function Index() {
+    const stars = useMemo(() =>
+        [...Array(50)].map((_, i) => ({
+            key: i,
+            left: Math.random() * 100,
+            top: Math.random() * 100,
+            animation_delay: Math.random() * 3
+        })), []
+    );
 
-export default function LoginScreen({ onLogin }: LoginScreenProps) {
-  const [hoveredIcon, setHoveredIcon] = useState<string | null>(null);
-  const [isSignup, setIsSignup] = useState(false);
-  const [username, setUsername] = useState('');
-  const [showWelcome, setShowWelcome] = useState(false);
+    const [pressed_signin, set_pressed_signin] = useState(false);
+    const [pressed_google, set_pressed_google] = useState(false);
 
-  const stars = useMemo(
-    () =>
-      [...Array(50)].map((_, i) => ({
-        key: i,
-        left: Math.random() * Dimensions.get('window').width,
-        top: Math.random() * Dimensions.get('window').height,
-      })),
-    []
-  );
+    return (
+        <SafeAreaView style={styles.container}>
+            {/* Background Gradient */}
+            <LinearGradient
+                colors={["#000000", "#0f172a", "#1e1b4b"]}
+                start={{ x: 0.5, y: 0 }}
+                end={{ x: 0.5, y: 1 }}
+                style={StyleSheet.absoluteFill}
+            />
 
-  return (
-    <SafeAreaView style={styles.container}>
-      {/* Stars background */}
-      {stars.map((star) => (
-        <View
-          key={star.key}
-          style={[styles.star, { left: star.left, top: star.top }]}
-        />
-      ))}
+            {/* Stars */}
+            <View style={styles.star_container}>
+                {stars.map((star) => (
+                    <TwinklingStar
+                        key={star.key}
+                        left={star.left}
+                        top={star.top}
+                        animation_delay={star.animation_delay}
+                    />
+                ))}
+            </View>
 
-      {/* Welcome overlay */}
-      {showWelcome && username && (
-        <View style={styles.overlay}>
-          <View style={styles.welcomeBox}>
-            <Text style={styles.welcomeText}>Welcome back,</Text>
-            <Text style={styles.usernameText}>{username}!</Text>
-          </View>
-        </View>
-      )}
+            {/* Login Container */}
+            <View style={styles.login_container}>
+                {/* Logo and Subtitle */}
+                <MotiView
+                    from={{ opacity: 0, transform: [{ translateY: 20 }] }}
+                    animate={{ opacity: 1, transform: [{ translateY: 0 }] }}
+                    transition={{ type: "timing", duration: 800, easing: Easing.bezier(0.23, 1, 0.32, 1) }}
+                    style={{
+                        alignItems: "center",
+                        marginBottom: 64
+                    }}
+                >
+                    <View style={{ marginBottom: 24 }}>
+                        <MosaicLogo size="lg" />
+                    </View>
+                    <Text style={{ color: "rgb(148, 163, 184)", fontSize: 20, fontWeight: "light" }}>Discover what to watch together</Text>
+                </MotiView>
 
-      <ScrollView contentContainerStyle={styles.scrollContent}>
-        {/* ✅ Logo and tagline */}
-        <View style={styles.logoContainer}>
-          <MosaicLogo size="lg" animated />
-          <Text style={styles.tagline}>Discover what to watch together</Text>
-        </View>
+                {/* Form */}
+                <MotiView
+                    from={{ opacity: 0, transform: [{ translateY: 30 }] }}
+                    animate={{ opacity: 1, transform: [{ translateY: 0 }] }}
+                    transition={{ type: "timing", duration: 800, delay: 200, easing: Easing.bezier(0.23, 1, 0.32, 1) }}
+                    style={{
+                        width: "100%",
+                        gap: 12,
+                    }}
+                >
+                    <View style={styles.form_container}>
+                        {/* Email/Username Input */}
+                        <View style={{ marginBottom: 24 }}>
+                            <Text style={styles.inputs_label}>
+                                Email or Username
+                            </Text>
+                            <TextInput
+                                placeholder="Enter your email or username"
+                                placeholderTextColor="#64748B"
+                                style={styles.login_inputs}
+                            />
+                        </View>
 
-        {/* Login form */}
-        <View style={styles.formContainer}>
-          <Text style={styles.label}>
-            {isSignup ? 'Email' : 'Username or Email'}
-          </Text>
-          <TextInput
-            style={styles.input}
-            placeholder={
-              isSignup
-                ? 'Enter your email'
-                : 'Enter your username or email'
-            }
-            placeholderTextColor="#999"
-            value={username}
-            onChangeText={setUsername}
-          />
+                        {/* Password Input */}
+                        <View style={{ marginBottom: 24 }}>
+                            <Text style={styles.inputs_label}>
+                                Password
+                            </Text>
+                            <TextInput
+                                placeholder="Enter your password"
+                                placeholderTextColor="#64748B"
+                                secureTextEntry
+                                style={styles.login_inputs}
+                            />
+                        </View>
 
-          <Text style={styles.label}>Password</Text>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your password"
-            placeholderTextColor="#999"
-            secureTextEntry
-          />
+                        {/* Login Button */}
+                        <TouchableOpacity
+                            onPressIn={() => set_pressed_signin(true)}
+                            onPressOut={() => set_pressed_signin(false)}
+                            activeOpacity={1}
+                        >
+                            <LinearGradient
+                                colors={pressed_signin ? ["#4338ca", "#4f46e5"] : ["#4f46e5", "#6366f1"]}
+                                start={{ x: 0, y: 0.5 }}
+                                end={{ x: 1, y: 0.5 }}
+                                style={styles.primary_button}
+                            >
+                                <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Sign In</Text>
+                            </LinearGradient>
+                        </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.button}
-            onPress={() => {
-              if (isSignup) {
-                onLogin(true);
-              } else {
-                if (username) {
-                  setShowWelcome(true);
-                  setTimeout(() => onLogin(false), 1500);
-                } else {
-                  onLogin(false);
-                }
-              }
-            }}
-          >
-            <Text style={styles.buttonText}>
-              {isSignup ? 'Continue' : 'Sign In'}
-            </Text>
-          </TouchableOpacity>
+                        {/* Divider */}
+                        <View style={{ marginVertical: 32, flexDirection: "row", alignItems: "center" }}>
+                            <View style={{ flex: 1, height: 1, backgroundColor: "#334155" }} />
+                            <Text style={{ marginHorizontal: 12, color: "#64748B", fontWeight: "500" }}>
+                                Or continue with
+                            </Text>
+                            <View style={{ flex: 1, height: 1, backgroundColor: "#334155" }} />
+                        </View>
 
-          <Text style={styles.orText}>Or continue with</Text>
+                        {/* Google Button */}
+                        <View style={{ gap: 12 }}>
+                            <TouchableOpacity
+                                style={[
+                                    styles.google_button_base,
+                                    pressed_google ? styles.google_button_hover : styles.google_button
+                                ]}
+                                onPressIn={() => set_pressed_google(true)}
+                                onPressOut={() => set_pressed_google(false)}
+                                activeOpacity={1}
+                            >
+                                <GoogleSVG width={20} height={20} style={{ marginRight: 12 }} />
+                                <Text style={{ color: "white", fontWeight: "500" }}>
+                                    Continue with Google
+                                </Text>
+                            </TouchableOpacity>
+                        </View>
 
-          {/* ...social login buttons... */}
-
-          <View style={styles.toggleTextContainer}>
-            <Text style={styles.toggleText}>
-              {!isSignup
-                ? "Don't have an account?"
-                : 'Already have an account?'}
-            </Text>
-            <TouchableOpacity onPress={() => setIsSignup(!isSignup)}>
-              <Text style={styles.toggleButtonText}>
-                {!isSignup ? 'Sign up' : 'Sign in'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </ScrollView>
-    </SafeAreaView>
-  );
+                        {/* Sign Up Link */}
+                        <MotiText
+                            style={{
+                                textAlign: "center",
+                                marginTop: 16,
+                                color: "#64748B",
+                                fontSize: 14,
+                            }}
+                            from={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 500 }}
+                        >
+                            Don't have an account?{' '}
+                            <Text
+                                style={{ color: "#818cf8", fontWeight: "500" }}
+                            >
+                                Sign up
+                            </Text>
+                        </MotiText>
+                    </View>
+                </MotiView>
+            </View>
+        </SafeAreaView>
+    );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0F0F23' },
-  scrollContent: {
-    flexGrow: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 20,
-  },
-  star: {
-    position: 'absolute',
-    width: 2,
-    height: 2,
-    borderRadius: 1,
-    backgroundColor: '#fff',
-    opacity: 0.3,
-  },
-  overlay: {
-    position: 'absolute',
-    top: 0, left: 0, right: 0, bottom: 0,
-    backgroundColor: 'rgba(0,0,0,0.8)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  welcomeBox: { alignItems: 'center' },
-  welcomeText: { color: '#fff', fontSize: 32, marginBottom: 4 },
-  usernameText: { color: '#6366F1', fontSize: 28, fontWeight: '500' },
-
-  logoContainer: { alignItems: 'center', marginBottom: 40 },
-  tagline: { color: '#ccc', fontSize: 18, marginTop: 8 },
-
-  formContainer: { width: '100%', maxWidth: 400 },
-  label: { color: '#ccc', fontSize: 14, marginBottom: 6 },
-  input: {
-    backgroundColor: 'rgba(100,100,120,0.5)',
-    borderRadius: 12,
-    height: 50,
-    paddingHorizontal: 16,
-    color: '#fff',
-    marginBottom: 16,
-  },
-  button: {
-    backgroundColor: '#6366F1',
-    height: 50,
-    borderRadius: 12,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
-  },
-  buttonText: { color: '#fff', fontSize: 16, fontWeight: '600' },
-  orText: { color: '#888', textAlign: 'center', marginVertical: 10 },
-  toggleTextContainer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 20,
-  },
-  toggleText: { color: '#888' },
-  toggleButtonText: { color: '#6366F1', marginLeft: 4 },
+    container: {
+        flex: 1,
+        overflow: "hidden",
+        position: "relative",
+    },
+    login_container: {
+        flex: 1,
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        position: "relative",
+        padding: 6,
+        zIndex: 10
+    },
+    login_inputs: {
+        backgroundColor: "rgba(30,41,59,0.5)",
+        borderWidth: 1,
+        borderColor: "#334155",
+        borderRadius: 12,
+        height: 48,
+        color: "white",
+        paddingHorizontal: 12,
+    },
+    form_container: {
+        backgroundColor: "rgba(30,41,59,0.1)",
+        borderWidth: 1,
+        borderColor: "rgba(99,102,241,0.2)",
+        borderRadius: 24,
+        padding: 32,
+        boxShadow: "0 25px 50px -12px rgba(0, 0, 0, 0.25)",
+        backdropFilter: "blur(40px)",
+    },
+    inputs_label: {
+        color: "#CBD5E1",
+        fontWeight: "500",
+        marginBottom: 8
+    },
+    primary_button: {
+        borderRadius: 12,
+        borderWidth: 0,
+        height: 48,
+        justifyContent: "center",
+        alignItems: "center",
+        boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
+        width: "100%",
+        shadowColor: "rgba(102, 126, 234, 0.25)"
+    },
+    google_button_base: {
+        borderRadius: 12,
+        height: 48,
+        justifyContent: "center",
+        alignItems: "center",
+        flexDirection: "row",
+        borderWidth: 1,
+    },
+    google_button: {
+        backgroundColor: "rgba(30, 41, 59, 0.3)",
+        borderColor: "rgb(51, 65, 85)",
+    },
+    google_button_hover: {
+        backgroundColor: "rgba(79, 70, 229, 0.2)",
+        borderColor: "rgb(99, 102, 241)",
+        shadowColor: "rgba(99, 102, 241, 0.25)",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 4,
+    },
+    star_container: {
+        ...StyleSheet.absoluteFillObject,
+        overflow: "hidden",
+    },
 });
