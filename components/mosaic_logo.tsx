@@ -1,128 +1,57 @@
-import { Film } from 'lucide-react-native';
-import React, { memo, useEffect, useRef } from 'react';
-import { Animated, Easing, StyleSheet, View } from 'react-native';
+import { Film } from "lucide-react-native";
+import { MotiView } from "moti";
+import React from "react";
+import { Text, View } from "react-native";
+import { Easing } from 'react-native-reanimated';
+
 
 interface MosaicLogoProps {
-    size?: 'sm' | 'md' | 'lg';
-    animated?: boolean;
-    className?: string;
+    size?: "sm" | "md" | "lg";
 }
 
-const MosaicLogoComponent = memo(function MosaicLogoComponent({
-    size = 'md',
-    animated = true,
-}: MosaicLogoProps) {
-    const iconScale = useRef(new Animated.Value(1)).current;
-    const iconRotate = useRef(new Animated.Value(0)).current;
-    const textOpacity = useRef(new Animated.Value(1)).current;
-    const textTranslate = useRef(new Animated.Value(0)).current;
-
-    const sizes = {
+export function MosaicLogo({ size = "md"}: MosaicLogoProps) {
+    const size_map = {
         sm: { text: 18, icon: 16 },
-        md: { text: 24, icon: 24 },
-        lg: { text: 32, icon: 32 },
+        md: { text: 30, icon: 24 },
+        lg: { text: 48, icon: 32 },
     };
 
-    useEffect(() => {
-        if (!animated) return;
-
-        const animate = () => {
-            // Reset values
-            iconScale.setValue(0);
-            iconRotate.setValue(-90);
-            textOpacity.setValue(0);
-            textTranslate.setValue(-20);
-
-            // Icon animation
-            Animated.parallel([
-                Animated.timing(iconScale, {
-                    toValue: 1,
-                    duration: 600,
-                    easing: Easing.out(Easing.exp),
-                    useNativeDriver: true,
-                }),
-                Animated.timing(iconRotate, {
-                    toValue: 0,
-                    duration: 600,
-                    easing: Easing.out(Easing.exp),
-                    useNativeDriver: true,
-                }),
-                Animated.sequence([
-                    Animated.delay(200),
-                    Animated.parallel([
-                        Animated.timing(textOpacity, {
-                            toValue: 1,
-                            duration: 600,
-                            useNativeDriver: true,
-                        }),
-                        Animated.timing(textTranslate, {
-                            toValue: 0,
-                            duration: 600,
-                            easing: Easing.out(Easing.exp),
-                            useNativeDriver: true,
-                        }),
-                    ]),
-                ]),
-            ]).start();
-        };
-
-        // Run first after 7s, then every 7s
-        const timeout = setTimeout(() => {
-            animate();
-            const interval = setInterval(animate, 7000);
-            return () => clearInterval(interval);
-        }, 7000);
-
-        return () => clearTimeout(timeout);
-    }, [animated]);
+    const { text, icon } = size_map[size];
 
     return (
-        <View style={styles.container}>
-            <Animated.View
-                style={{
-                    transform: [
-                        { scale: iconScale },
-                        {
-                            rotate: iconRotate.interpolate({
-                                inputRange: [-90, 0],
-                                outputRange: ['-90deg', '0deg'],
-                            }),
-                        },
-                    ],
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <MotiView
+                from={{ scale: 0, rotate: "-90deg" }}
+                animate={{ scale: 1, rotate: "0deg" }}
+                transition={{
+                    type: "timing",
+                    duration: 600,
+                    easing: Easing.bezier(0.23, 1, 0.32, 1)
                 }}
             >
-                <Film size={sizes[size].icon} color="#6366F1" />
-            </Animated.View>
+                <Film size={icon} color="#818cf8" />
+            </MotiView>
 
-            <Animated.Text
-                style={[
-                    styles.text,
-                    {
-                        fontSize: sizes[size].text,
-                        opacity: textOpacity,
-                        transform: [{ translateX: textTranslate }],
-                    },
-                ]}
+            <MotiView
+                from={{ opacity: 0, translateX: -20 }}
+                animate={{ opacity: 1, translateX: 0 }}
+                transition={{
+                    type: "timing",
+                    duration: 600,
+                    delay: 200,
+                    easing: Easing.bezier(0.23, 1, 0.32, 1),
+                }}
             >
-                Mosaic
-            </Animated.Text>
+                <Text
+                    style={{
+                        fontSize: text,
+                        fontWeight: "bold",
+                        color: "#818cf8",
+                    }}
+                >
+                    Mosaic
+                </Text>
+            </MotiView>
         </View>
     );
-});
-
-export function MosaicLogo(props: MosaicLogoProps) {
-    return <MosaicLogoComponent {...props} />;
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 8,
-    },
-    text: {
-        fontWeight: 'bold',
-        color: '#6366F1',
-        marginLeft: 8,
-    },
-});
