@@ -4,7 +4,7 @@ import { TwinklingStar } from "@/components/twinkle_star";
 import { sign_up } from "@/lib/firebase_auth";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
-import { ArrowLeft } from "lucide-react-native"; // Or use a react-native-vector-icons alternative
+import { ArrowLeft } from "lucide-react-native";
 import { MotiView } from "moti";
 import { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
