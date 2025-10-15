@@ -144,6 +144,7 @@ export function ProfileScreen() {
             </View>
           </View>
           
+          {/* Streaming Services Card */}
           <View style={styles.card}>
             <View style={styles.cardHeaderIcon}>
                <Tv color="#5C7AB8" size={20} />
