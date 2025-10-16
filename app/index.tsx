@@ -1,4 +1,5 @@
 import { auth } from '@/lib/firebase_config';
+import { get_user_data } from '@/lib/firebase_firestore';
 import { useRouter } from 'expo-router';
 import { useEffect } from 'react';
 import { ActivityIndicator, View } from 'react-native';
@@ -9,7 +10,16 @@ export default function Index() {
     useEffect(() => {
         const unsubscribe = auth.onAuthStateChanged((user) => {
             if (user) {
-                router.replace('/quiz');  // navigate if logged in
+                const user = auth.currentUser;
+                const user_data = get_user_data(user!.uid);
+
+                user_data.then((data) => {
+                    if (typeof (data) == "object" && !data?.taken_quiz) {
+                        router.replace("/quiz");
+                    } else {
+                        router.replace("/home");
+                    }
+                });
             } else {
                 router.replace('/login');
             }

@@ -2,7 +2,6 @@ import { LoadingPopup } from "@/components/loading_popup";
 import { TwinklingStar } from "@/components/twinkle_star";
 import { auth } from "@/lib/firebase_config";
 import { add_quiz } from "@/lib/firebase_firestore";
-import { MaterialIcons } from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
@@ -84,6 +83,7 @@ export default function QuizScreen() {
 
     const handleContinue = () => {
         if (step === 1 && selectedGenres.length === 3) setStep(2);
+        if (step === 2 && Object.keys(moodAnswers).length === moods.length) handle_finish();
     };
 
     const handleBack = () => {
@@ -199,15 +199,6 @@ export default function QuizScreen() {
                                             >
                                                 <Text style={styles.genreEmoji}>{genre.emoji}</Text>
                                                 <Text style={styles.genreLabel}>{genre.name}</Text>
-                                                {selected && (
-                                                    <View style={styles.checkCircle}>
-                                                        <MaterialIcons
-                                                            name="check"
-                                                            size={18}
-                                                            color="white"
-                                                        />
-                                                    </View>
-                                                )}
                                             </TouchableOpacity>
                                         );
                                     })}
@@ -250,15 +241,6 @@ export default function QuizScreen() {
                                                             <Text style={styles.moodText}>
                                                                 {option.text}
                                                             </Text>
-                                                            {selected && (
-                                                                <View style={styles.checkCircle}>
-                                                                    <MaterialIcons
-                                                                        name="check"
-                                                                        size={18}
-                                                                        color="white"
-                                                                    />
-                                                                </View>
-                                                            )}
                                                         </TouchableOpacity>
                                                     );
                                                 })}
