@@ -25,7 +25,7 @@ export async function new_user(uid: string, email: string, username: string) {
     }
 }
 
-export async function add_quiz(uid: string, favorite_genre: string[], mood: Map<string, string>) {
+export async function add_quiz(uid: string, favorite_genre: string[], mood: Record<string, string>) {
     try {
         const userRef = doc(firestore, "Users", uid);
 
