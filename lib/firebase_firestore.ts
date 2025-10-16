@@ -1,5 +1,5 @@
 import { firestore } from "@/lib/firebase_config";
-import { doc, setDoc } from "firebase/firestore";
+import { doc, getDoc, setDoc, where } from "firebase/firestore";
 
 export async function new_user(uid: string, email: string, username: string) {
     try {
@@ -16,10 +16,8 @@ export async function new_user(uid: string, email: string, username: string) {
             createdAt: new Date().toISOString(),
         });
 
-        console.log("User document created for UID:", uid);
         return true;
     } catch (error: any) {
-        console.error("Error creating user document:", error.message);
         return error.message;
     }
 }
