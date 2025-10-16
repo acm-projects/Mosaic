@@ -1,12 +1,16 @@
+import { LoadingPopup } from "@/components/loading_popup";
+import { TwinklingStar } from "@/components/twinkle_star";
+import { auth } from "@/lib/firebase_config";
+import { add_quiz } from "@/lib/firebase_firestore";
 import { MaterialIcons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
+import { MotiText, MotiView } from "moti";
 import React, { useMemo, useState } from "react";
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { Easing } from "react-native-reanimated";
-import { MotiView, MotiText } from "moti";
-import { TwinklingStar } from "@/components/twinkle_star"; // same as login page
+import { SafeAreaView } from "react-native-safe-area-context";
 
 const genres = [
     { name: "Action", emoji: "💥" },
@@ -57,6 +61,7 @@ export default function QuizScreen() {
     const [selectedGenres, setSelectedGenres] = useState<string[]>([]);
     const [step, setStep] = useState(1);
     const [moodAnswers, setMoodAnswers] = useState<Record<string, string>>({});
+    const [loading, setLoading] = useState(false);
 
     const stars = useMemo(
         () =>
@@ -85,6 +90,20 @@ export default function QuizScreen() {
         if (step === 2) setStep(1);
     };
 
+    function handle_finish() {
+        setLoading(true);
+
+        const user = auth.currentUser;
+        add_quiz(user?.uid!, selectedGenres, moodAnswers).then((result) => {
+            setLoading(false);
+            if (result === true) {
+                router.replace("/home");
+            } else {
+                alert("Error: " + result);
+            }
+        });
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             {/* Gradient Background */}
@@ -106,6 +125,8 @@ export default function QuizScreen() {
                     />
                 ))}
             </View>
+
+            <LoadingPopup visible={loading}/>
 
             {/* Content */}
             <View style={styles.contentContainer}>

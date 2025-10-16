@@ -3,6 +3,8 @@ import { LoadingPopup } from '@/components/loading_popup';
 import { MosaicLogo } from '@/components/mosaic_logo';
 import { TwinklingStar } from '@/components/twinkle_star';
 import { login } from '@/lib/firebase_auth';
+import { auth } from '@/lib/firebase_config';
+import { get_user_data } from '@/lib/firebase_firestore';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { MotiText, MotiView } from 'moti';
@@ -43,7 +45,16 @@ export default function Login() {
 
         login(email, password).then((result) => {
             if (result === true) {
-                // router.replace("/home");
+                const user = auth.currentUser;
+                const user_data = get_user_data(user!.uid);
+
+                user_data.then((data) => {
+                    if (typeof(data) == "object" && !data?.taken_quiz) {
+                        router.replace("/quiz");
+                    } else {
+                        router.replace("/home");
+                    }
+                });
             } else {
                 set_error_message(result as string);
                 set_error_visible(true);
