@@ -1,11 +1,13 @@
+// Refactored SignUp screen with consistent UI, error handling, and real-time validation
 import { LoadingPopup } from "@/components/loading_popup";
 import { MosaicLogo } from "@/components/mosaic_logo";
 import { TwinklingStar } from "@/components/twinkle_star";
 import { sign_up } from "@/lib/firebase_auth";
 import { LinearGradient } from "expo-linear-gradient";
 import { useRouter } from "expo-router";
+import { ArrowLeft } from "lucide-react-native";
 import { MotiView } from "moti";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import { Easing } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -13,183 +15,77 @@ import { SafeAreaView } from "react-native-safe-area-context";
 export default function SignUp() {
     const router = useRouter();
     const stars = useMemo(() =>
-        [...Array(50)].map((_, i) => ({
-            key: i,
-            left: Math.random() * 100,
-            top: Math.random() * 100,
-            animation_delay: Math.random() * 3
-        })), []
+        [...Array(50)].map((_, i) => ({ key: i, left: Math.random() * 100, top: Math.random() * 100, animation_delay: Math.random() * 3 })), []
     );
 
-    const [email, set_email] = useState('');
-    const [username, set_username] = useState('');
-    const [password, set_password] = useState('');
-    const [confirm_password, set_confirm_password] = useState('');
-    const [error_message, set_error] = useState('');
-    const [error_visible, set_error_visible] = useState(false);
-    const [loading, set_loading] = useState(false);
-    const [pressed_signup, set_pressed_signup] = useState(false);
+    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
+    const [loading, setLoading] = useState(false);
+    const [pressedSignup, setPressedSignup] = useState(false);
 
-    function handle_singup() {
-        if (!email || !username || !password || !confirm_password) {
-            set_error('Please fill in all fields');
+    // Real-time validation
+    useEffect(() => {
+        if (!email || !username || !password || !confirmPassword) {
+            setErrorMessage('');
             return;
         }
-        if (password !== confirm_password) {
-            set_error('Passwords do not match');
+        if (password !== confirmPassword) {
+            setErrorMessage('Passwords do not match');
+        } else if (password.length < 8) {
+            setErrorMessage('Password must be at least 8 characters');
+        } else {
+            setErrorMessage('');
+        }
+    }, [email, username, password, confirmPassword]);
+
+    async function handleSignup() {
+        if (errorMessage) return;
+        if (!email || !username || !password) {
+            setErrorMessage('Please fill in all fields');
             return;
         }
-        if (password.length < 8) {
-            set_error('Password must be at least 8 characters');
-            return;
+        try {
+            setLoading(true);
+            const result = await sign_up(email, password, username);
+            if (result === true) router.replace('/quiz');
+            else if (typeof (result) == "string") setErrorMessage(result);
+        } catch (error) {
+            setErrorMessage('Something went wrong. Try again.');
+        } finally {
+            setLoading(false);
         }
-
-        set_loading(true);
-
-        sign_up(email, password, username).then(result => {
-            if (result === true) {
-                router.replace('/quiz');
-            } else {
-                set_error(result as string);
-            }
-        }).finally(() => set_loading(false));
-    };
+    }
 
     return (
         <SafeAreaView style={styles.container}>
             <LoadingPopup visible={loading} />
-
-            {/* Background Gradient */}
-            <LinearGradient
-                colors={["#000000", "#0f172a", "#1e1b4b"]}
-                start={{ x: 0.5, y: 0 }}
-                end={{ x: 0.5, y: 1 }}
-                style={StyleSheet.absoluteFill}
-            />
-
-            {/* Stars */}
+            <LinearGradient colors={["#000000", "#0f172a", "#1e1b4b"]} start={{ x: 0.5, y: 0 }} end={{ x: 0.5, y: 1 }} style={StyleSheet.absoluteFill} />
             <View style={styles.star_container}>
-                {stars.map((star) => (
-                    <TwinklingStar
-                        key={star.key}
-                        left={star.left}
-                        top={star.top}
-                        animation_delay={star.animation_delay}
-                    />
-                ))}
+                {stars.map((star) => (<TwinklingStar key={star.key} left={star.left} top={star.top} animation_delay={star.animation_delay} />))}
             </View>
-
-            {/* Login Container */}
             <View style={styles.login_container}>
-                {/* Logo and Subtitle */}
-                <MotiView
-                    from={{ opacity: 0, transform: [{ translateY: 20 }] }}
-                    animate={{ opacity: 1, transform: [{ translateY: 0 }] }}
-                    transition={{ type: "timing", duration: 800, easing: Easing.bezier(0.23, 1, 0.32, 1) }}
-                    style={{
-                        alignItems: "center",
-                        marginBottom: 64
-                    }}
-                >
-                    <View style={{ marginBottom: 24 }}>
-                        <MosaicLogo size="lg" />
-                    </View>
-                    <Text style={{ color: "rgb(148, 163, 184)", fontSize: 20, fontWeight: "light" }}>Discover what to watch together</Text>
+                <ArrowLeft size={24} color={"white"} style={{ position: "absolute", top: 40, left: 20, zIndex: 20 }} onPress={() => { router.back() }} />
+                <MotiView from={{ opacity: 0, translateY: 20 }} animate={{ opacity: 1, translateY: 0 }} transition={{ type: "timing", duration: 800, easing: Easing.bezier(0.23, 1, 0.32, 1) }} style={{ alignItems: "center", marginBottom: 64 }}>
+                    <View style={{ marginBottom: 24 }}><MosaicLogo size="lg" /></View>
+                    <Text style={{ color: "rgb(148, 163, 184)", fontSize: 20, fontWeight: "300" }}>Discover what to watch together</Text>
                 </MotiView>
-
-                {/* Form */}
-                <MotiView
-                    from={{ opacity: 0, transform: [{ translateY: 30 }] }}
-                    animate={{ opacity: 1, transform: [{ translateY: 0 }] }}
-                    transition={{ type: "timing", duration: 800, delay: 200, easing: Easing.bezier(0.23, 1, 0.32, 1) }}
-                    style={{
-                        width: "100%",
-                        gap: 12,
-                    }}
-                >
+                <MotiView from={{ opacity: 0, translateY: 30 }} animate={{ opacity: 1, translateY: 0 }} transition={{ type: "timing", duration: 800, delay: 200, easing: Easing.bezier(0.23, 1, 0.32, 1) }} style={{ width: "100%", gap: 12 }}>
                     <View style={styles.form_container}>
-                        {/* Email Input */}
-                        <View style={{ marginBottom: 24 }}>
-                            <Text style={styles.inputs_label}>
-                                Email
-                            </Text>
-                            <TextInput
-                                placeholder="Enter your email"
-                                placeholderTextColor="#64748B"
-                                style={styles.login_inputs}
-                                value={email}
-                                onChangeText={set_email}
-                            />
-                        </View>
-
-                        {/* Username Input */}
-                        <View style={{ marginBottom: 24 }}>
-                            <Text style={styles.inputs_label}>
-                                Username
-                            </Text>
-                            <TextInput
-                                placeholder="Enter your username"
-                                placeholderTextColor="#64748B"
-                                style={styles.login_inputs}
-                                value={username}
-                                onChangeText={set_username}
-                            />
-                        </View>
-
-                        {/* Password Input */}
-                        <View style={{ marginBottom: 24 }}>
-                            <Text style={styles.inputs_label}>
-                                Password
-                            </Text>
-                            <TextInput
-                                placeholder="Enter your password"
-                                placeholderTextColor="#64748B"
-                                secureTextEntry
-                                style={styles.login_inputs}
-                                value={password}
-                                onChangeText={set_password}
-                            />
-                        </View>
-
-                        {/* Confifrm Password Input */}
-                        <View style={{ marginBottom: 24 }}>
-                            <Text style={styles.inputs_label}>
-                                Confirm Password
-                            </Text>
-                            <TextInput
-                                placeholder="Confirm password"
-                                placeholderTextColor="#64748B"
-                                secureTextEntry
-                                style={styles.login_inputs}
-                                value={confirm_password}
-                                onChangeText={set_confirm_password}
-                            />
-                        </View>
-
-                        {error_visible && <View style={{ marginBottom: 10, alignItems: "center" }}>
-                            <Text style={{
-                                color: "#c10007",
-                                fontWeight: "semibold",
-                                fontSize: 12,
-                                opacity: 0.75,
-                            }}>
-                                {error_message}
-                            </Text>
-                        </View>}
-
-                        {/* Login Button */}
-                        <TouchableOpacity
-                            onPressIn={() => set_pressed_signup(true)}
-                            onPressOut={() => set_pressed_signup(false)}
-                            onPress={handle_singup}
-                            activeOpacity={1}
-                        >
-                            <LinearGradient
-                                colors={pressed_signup ? ["#4338ca", "#4f46e5"] : ["#4f46e5", "#6366f1"]}
-                                start={{ x: 0, y: 0.5 }}
-                                end={{ x: 1, y: 0.5 }}
-                                style={styles.primary_button}
-                            >
+                        <Field label="Email" value={email} onChange={setEmail} placeholder="Enter your email" />
+                        <Field label="Username" value={username} onChange={setUsername} placeholder="Enter your username" />
+                        <Field label="Password" value={password} onChange={setPassword} placeholder="Enter your password" secure />
+                        <Field label="Confirm Password" value={confirmPassword} onChange={setConfirmPassword} placeholder="Confirm password" secure />
+                        {errorMessage ? <Text style={{
+                            color: "#c10007",
+                            fontWeight: "semibold",
+                            fontSize: 12,
+                            opacity: 0.75,
+                        }}>{errorMessage}</Text> : null}
+                        <TouchableOpacity onPressIn={() => setPressedSignup(true)} onPressOut={() => setPressedSignup(false)} onPress={handleSignup} activeOpacity={1}>
+                            <LinearGradient colors={pressedSignup ? ["#4338ca", "#4f46e5"] : ["#4f46e5", "#6366f1"]} start={{ x: 0, y: 0.5 }} end={{ x: 1, y: 0.5 }} style={styles.primary_button}>
                                 <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Sign Up</Text>
                             </LinearGradient>
                         </TouchableOpacity>
@@ -200,6 +96,16 @@ export default function SignUp() {
     );
 }
 
+function Field({ label, value, onChange, placeholder, secure }: { label: string; value: string; onChange: (text: string) => void; placeholder: string; secure?: boolean }) {
+    return (
+        <View style={{ marginBottom: 24 }}>
+            <Text style={styles.inputs_label}>{label}</Text>
+            <TextInput placeholder={placeholder} placeholderTextColor="#64748B" style={styles.login_inputs} value={value} onChangeText={onChange} secureTextEntry={secure} />
+        </View>
+    );
+}
+
+// TODO: Finalize styles to match Login exactly
 const styles = StyleSheet.create({
     container: {
         flex: 1,
