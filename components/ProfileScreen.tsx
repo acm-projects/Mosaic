@@ -13,7 +13,7 @@ import {
 import { LinearGradient } from 'expo-linear-gradient';
 import { Award, Bell, Check, LogOut, RefreshCw, Tv, User } from 'lucide-react-native';
 import Svg, { Path } from 'react-native-svg';
-import { useApp } from '../context/AppContext';
+import { useApp } from '../context/AppContext.tsx/AppContext';
 
 // --- Constants ---
 const LEVELS = [ 
