@@ -10,7 +10,6 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.galaxies.firebase",
       "googleServicesFile": "./GoogleService-Info.plist"
     },
     "android": {
@@ -22,8 +21,8 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.galaxies.firebase",
-      "googleServicesFile": "./google-services.json"
+      "googleServicesFile": "./google-services.json",
+      "package": "com.anonymous.mosaic"
     },
     "web": {
       "output": "static",
