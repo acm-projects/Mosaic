@@ -1,8 +1,8 @@
 import GoogleSVG from '@/assets/svg/google.svg';
 import AuthButton from "@/components/auth_button";
 import AuthInput from '@/components/auth_input';
-import { LoadingPopup } from '@/components/loading_popup';
-import { MosaicLogo } from '@/components/mosaic_logo';
+import LoadingPopup from '@/components/loading_popup';
+import MosaicLogo from '@/components/mosaic_logo';
 import PageBackground from '@/components/page_background';
 import { login } from '@/lib/firebase_auth';
 import { auth } from '@/lib/firebase_config';

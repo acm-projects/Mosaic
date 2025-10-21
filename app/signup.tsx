@@ -1,28 +1,19 @@
 import AuthButton from "@/components/auth_button";
 import AuthInput from "@/components/auth_input";
-import { LoadingPopup } from "@/components/loading_popup";
-import { MosaicLogo } from "@/components/mosaic_logo";
+import LoadingPopup from "@/components/loading_popup";
+import MosaicLogo from "@/components/mosaic_logo";
 import PageBackground from "@/components/page_background";
 import { sign_up } from "@/lib/firebase_auth";
 import { styles } from "@/lib/styles";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import { MotiView } from "moti";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Text, View } from "react-native";
 import { Easing } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function SignUp() {
-    const stars = useMemo(() =>
-        [...Array(50)].map((_, i) => ({
-            key: i,
-            left: Math.random() * 100,
-            top: Math.random() * 100,
-            animation_delay: Math.random() * 3
-        })), []
-    );
-
     const [email, set_email] = useState('');
     const [username, set_username] = useState('');
     const [password, set_password] = useState('');

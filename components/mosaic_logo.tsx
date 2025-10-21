@@ -5,11 +5,7 @@ import { Text, View } from "react-native";
 import { Easing } from 'react-native-reanimated';
 
 
-interface Props {
-    size?: "sm" | "md" | "lg";
-}
-
-export function MosaicLogo({ size = "md" }: Props) {
+export default function MosaicLogo({ size = "md" }: { size?: "sm" | "md" | "lg"; }) {
     const size_map = {
         sm: { text: 18, icon: 16 },
         md: { text: 30, icon: 24 },
