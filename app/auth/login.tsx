@@ -43,7 +43,7 @@ export default function Login() {
 
                 user_data.then((data) => {
                     if (typeof (data) == "object" && !data?.taken_quiz) {
-                        router.replace("/quiz");
+                        router.replace("/onboarding/quiz");
                     } else {
                         router.replace("/home");
                     }
@@ -153,7 +153,7 @@ export default function Login() {
                             Don't have an account?{' '}
                             <Text
                                 style={{ color: "#818cf8", fontWeight: "500" }}
-                                onPress={() => router.push("/signup")}
+                                onPress={() => router.navigate("/auth/signup")}
                             >
                                 Sign up
                             </Text>

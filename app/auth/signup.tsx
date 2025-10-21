@@ -47,7 +47,7 @@ export default function SignUp() {
         try {
             set_loading(true);
             const result = await sign_up(email, password, username);
-            if (result === true) router.replace('/quiz');
+            if (result === true) router.replace('/onboarding/quiz');
             else if (typeof (result) == "string") set_error_message(result);
         } catch (error) {
             set_error_message('Something went wrong. Try again.');
