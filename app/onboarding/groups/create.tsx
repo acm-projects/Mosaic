@@ -1,5 +1,6 @@
 // src/screens/GroupSetup/CreateGroupScreen.tsx
 import PageBackground from '@/components/page_background';
+import { create_group } from '@/lib/firebase_firestore';
 import { router } from 'expo-router';
 import { ArrowLeft, Users } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -14,10 +15,21 @@ export default function CreateGroupScreen() {
     const [groupName, setGroupName] = useState('');
     const [selectedColor, setSelectedColor] = useState(groupColors[0]);
 
-    const handleCreate = () => {
+    function handleCreate() {
         if (!groupName) return;
-        const groupCode = Math.random().toString(36).substring(2, 8).toUpperCase();
-    };
+
+        create_group(groupName, selectedColor).then(result => {
+            if (typeof result === "string" && result.length === 6) {
+                router.replace(`/onboarding/groups/invite?code=${result}`);
+            } else {
+                alert("Error creating group: " + result);
+            }
+        }).catch(error => {
+            console.error("Create group failed:", error);
+            alert("Something went wrong. Please try again.");
+        });
+    }
+      
 
     return (
         <View style={styles.container}>

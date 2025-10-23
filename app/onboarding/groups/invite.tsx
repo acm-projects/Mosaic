@@ -1,17 +1,18 @@
 // src/screens/GroupSetup/InviteGroupScreen.tsx
-import { useRoute } from '@react-navigation/native';
 import * as Clipboard from 'expo-clipboard';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Copy, Users } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 
 export default function InviteGroupScreen() {
-    const { group_code } = useRoute().params as { group_code: string };
+    const { code } = useLocalSearchParams<{
+        code: string;
+    }>();
 
     const handleCopy = async () => {
         try {
-            await Clipboard.setStringAsync(group_code || '');
+            await Clipboard.setStringAsync(code || '');
             ToastAndroid.show('Code copied!', ToastAndroid.SHORT);
         } catch {
             ToastAndroid.show('Failed to copy.', ToastAndroid.SHORT);
@@ -40,7 +41,7 @@ export default function InviteGroupScreen() {
 
             {/* Code display box */}
             <View style={styles.codeContainer}>
-                <Text style={styles.codeText}>{group_code}</Text>
+                <Text style={styles.codeText}>{code}</Text>
                 <TouchableOpacity
                     onPress={handleCopy}
                     style={styles.copyButton}

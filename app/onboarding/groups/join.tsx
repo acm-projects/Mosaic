@@ -1,22 +1,39 @@
-// src/screens/GroupSetup/JoinGroupScreen.tsx
+import LoadingPopup from '@/components/loading_popup';
 import PageBackground from '@/components/page_background';
+import { join_group } from '@/lib/firebase_firestore';
 import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import React, { useState } from 'react';
-import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function JoinGroupScreen() {
-    const [joinCode, setJoinCode] = useState('');
+    const [join_code, set_join_code] = useState('');
+    const [loading, set_loading] = useState(false);
 
-    const handleJoin = () => {
-        if (joinCode.length === 6) {
-            router.navigate('/home');
+    const handleJoin = async () => {
+        if (join_code.length !== 6) return;
+
+        set_loading(true);
+        try {
+            const result = await join_group(join_code);
+
+            if (result.success) {
+                router.replace('/home');
+            } else {
+                Alert.alert('Error', result.error || 'Failed to join group.');
+            }
+        } catch (error) {
+            console.error('Join group failed:', error);
+            Alert.alert('Error', 'Something went wrong. Please try again.');
+        } finally {
+            set_loading(false);
         }
     };
 
     return (
         <View style={styles.container}>
             <PageBackground />
+            <LoadingPopup visible={loading} />
             {/* Back Button */}
             <TouchableOpacity
                 onPress={() => router.back()}
@@ -34,21 +51,26 @@ export default function JoinGroupScreen() {
             <TextInput
                 placeholder="e.g. ABC123"
                 placeholderTextColor="rgba(255,255,255,0.4)"
-                value={joinCode}
-                onChangeText={(text) => setJoinCode(text.toUpperCase())}
+                value={join_code}
+                onChangeText={(text) => set_join_code(text.toUpperCase())}
                 maxLength={6}
                 autoCapitalize="characters"
                 style={styles.input}
+                editable={!loading}
             />
 
             {/* Join button */}
             <TouchableOpacity
                 onPress={handleJoin}
-                style={[styles.joinButton, joinCode.length !== 6 && styles.disabledButton]}
+                style={[styles.joinButton, (join_code.length !== 6 || loading) && styles.disabledButton]}
                 activeOpacity={0.8}
-                disabled={joinCode.length !== 6}
+                disabled={join_code.length !== 6 || loading}
             >
-                <Text style={styles.joinButtonText}>Join Group</Text>
+                {loading ? (
+                    <ActivityIndicator color="white" />
+                ) : (
+                    <Text style={styles.joinButtonText}>Join Group</Text>
+                )}
             </TouchableOpacity>
         </View>
     );
