@@ -1,72 +1,115 @@
-import PageBackground from "@/components/page_background";
-import { StyleSheet, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+// src/screens/GroupSetup/JoinGroupScreen.tsx
+import PageBackground from '@/components/page_background';
+import { router } from 'expo-router';
+import { ArrowLeft } from 'lucide-react-native';
+import React, { useState } from 'react';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function JoinGroupScreen() {
-    return (
-        <SafeAreaView style={{
-            flex: 1,
-            overflow: "hidden",
-            position: "relative",
-            alignItems: "center",
-            justifyContent: "center",
-        }}>
-            <PageBackground />
+    const [joinCode, setJoinCode] = useState('');
 
-            <View style={local.container}>
-                
-            </View>
-        </SafeAreaView>
+    const handleJoin = () => {
+        if (joinCode.length === 6) {
+            router.navigate('/home');
+        }
+    };
+
+    return (
+        <View style={styles.container}>
+            <PageBackground />
+            {/* Back Button */}
+            <TouchableOpacity
+                onPress={() => router.back()}
+                style={styles.backButton}
+                activeOpacity={0.7}
+            >
+                <ArrowLeft size={20} color="white" />
+            </TouchableOpacity>
+
+            {/* Title and subtitle */}
+            <Text style={styles.title}>Join a Group</Text>
+            <Text style={styles.subtitle}>Enter the group code</Text>
+
+            {/* Input field */}
+            <TextInput
+                placeholder="e.g. ABC123"
+                placeholderTextColor="rgba(255,255,255,0.4)"
+                value={joinCode}
+                onChangeText={(text) => setJoinCode(text.toUpperCase())}
+                maxLength={6}
+                autoCapitalize="characters"
+                style={styles.input}
+            />
+
+            {/* Join button */}
+            <TouchableOpacity
+                onPress={handleJoin}
+                style={[styles.joinButton, joinCode.length !== 6 && styles.disabledButton]}
+                activeOpacity={0.8}
+                disabled={joinCode.length !== 6}
+            >
+                <Text style={styles.joinButtonText}>Join Group</Text>
+            </TouchableOpacity>
+        </View>
     );
 }
 
-const local = StyleSheet.create({
+const styles = StyleSheet.create({
     container: {
+        flex: 1,
+        backgroundColor: '#000',
         paddingHorizontal: 24,
-        paddingVertical: 48,
-        alignItems: "center",
-        justifyContent: "center",
-        textAlign: "center",
+        paddingTop: 64,
     },
-    iconWrapper: {
-        width: 80,
-        height: 80,
-        borderRadius: 40,
-        backgroundColor: "#6b8fe4",
-        alignItems: "center",
-        justifyContent: "center",
-        marginBottom: 16,
+    backButton: {
+        position: 'absolute',
+        top: 64,
+        left: 24,
+        width: 40,
+        height: 40,
+        borderRadius: 20,
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     title: {
-        fontSize: 20,
-        fontWeight: "600",
-        color: "white",
-        marginBottom: 6,
-        textAlign: "center",
+        fontSize: 24,
+        color: '#fff',
+        textAlign: 'center',
+        marginBottom: 12,
+        fontWeight: '600',
     },
     subtitle: {
-        fontSize: 14,
-        color: "#94A3B8",
+        color: 'rgba(255,255,255,0.7)',
+        textAlign: 'center',
         marginBottom: 24,
-        textAlign: "center",
-    },
-    createButton: {
-        flexDirection: "row",
-        backgroundColor: "#6b8fe4",
-        width: "auto",
-        paddingHorizontal: 20,
-        borderRadius: 12,
-        borderWidth: 0,
-        height: 48,
-        justifyContent: "center",
-        alignItems: "center",
-        boxShadow: "0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1)",
-        shadowColor: "rgba(102, 126, 234, 0.25)",
-        marginBottom: 12,
-    },
-    buttonText: {
-        color: "white",
         fontSize: 16,
-        fontWeight: "600",
+    },
+    input: {
+        height: 50,
+        borderColor: 'rgba(255,255,255,0.2)',
+        borderWidth: 1,
+        borderRadius: 8,
+        color: '#fff',
+        fontSize: 18,
+        textAlign: 'center',
+        letterSpacing: 4,
+    },
+    joinButton: {
+        width: '100%',
+        height: 48,
+        backgroundColor: '#7B9ED9',
+        borderRadius: 8,
+        marginTop: 32,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    joinButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+    },
+    disabledButton: {
+        opacity: 0.5,
     },
 });
