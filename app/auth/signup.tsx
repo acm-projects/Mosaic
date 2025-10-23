@@ -149,7 +149,7 @@ export default function SignUp() {
                                     </Text>
                                 ) : null}
 
-                                <AuthButton onPress={handle_signup} />
+                                <AuthButton onPress={handle_signup} text='Sign Up' />
                             </View>
                         </MotiView>
                     </View>

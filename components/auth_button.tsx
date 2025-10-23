@@ -2,7 +2,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { useState } from "react";
 import { StyleSheet, Text, TouchableOpacity } from "react-native";
 
-export default function AuthButton({ onPress }: { onPress?: () => void }) {
+export default function AuthButton({ text, onPress }: { text: string, onPress?: () => void }) {
     const [pressed_signin, set_pressed_signin] = useState(false);
 
     function handle_press() {
@@ -24,7 +24,7 @@ export default function AuthButton({ onPress }: { onPress?: () => void }) {
                 end={{ x: 1, y: 0.5 }}
                 style={styles.primary_button}
             >
-                <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>Sign In</Text>
+                <Text style={{ color: "white", fontWeight: "bold", fontSize: 16 }}>{text}</Text>
             </LinearGradient>
         </TouchableOpacity>
     );

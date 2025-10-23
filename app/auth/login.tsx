@@ -108,7 +108,7 @@ export default function Login() {
                         </View>}
 
                         {/* Login Button */}
-                        <AuthButton onPress={handle_login} />
+                        <AuthButton onPress={handle_login} text='Sign In' />
 
                         {/* Divider */}
                         <View style={{ marginVertical: 32, flexDirection: "row", alignItems: "center" }}>
