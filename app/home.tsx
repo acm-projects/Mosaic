@@ -5,13 +5,19 @@ import { Text, TouchableOpacity, View } from "react-native";
 
 export default function HomePage() {
     return (
-        <View style={{flex: 1, justifyContent: 'center', alignItems: 'center'}}>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
             <Text>Home Page</Text>
             <TouchableOpacity onPress={() => {
                 signOut(auth).then(() => {
-                    router.navigate('/login');
+                    router.navigate('/auth/login');
                 })
-            }} style={{marginTop: 20, padding: 10, backgroundColor: 'blue'}}> Sign out </TouchableOpacity>
+            }} style={{ marginTop: 20, padding: 10, backgroundColor: 'blue' }}>
+                <Text style={{
+                    color: 'white'
+                }}>
+                    Sign out
+                </Text>
+            </TouchableOpacity>
         </View>
     );
 }

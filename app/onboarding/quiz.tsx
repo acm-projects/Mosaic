@@ -36,7 +36,7 @@ export default function QuizScreen() {
             set_loading(true);
             const user = auth.currentUser;
             const result = await add_quiz(user?.uid!, selected_genres, mood_answers);
-            if (result === true) router.replace("/home");
+            if (result === true) router.navigate("/onboarding/groups/");
             else alert("Error: " + result);
         } finally {
             set_loading(false);
