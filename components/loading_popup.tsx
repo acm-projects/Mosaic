@@ -1,6 +1,6 @@
 import { ActivityIndicator, Modal, StyleSheet, View } from "react-native";
 
-export function LoadingPopup({ visible }: { visible: boolean }) {
+export default function LoadingPopup({ visible }: { visible: boolean }) {
     return (
         <Modal transparent animationType="fade" visible={visible}>
             <View style={styles.overlay}>
