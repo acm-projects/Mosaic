@@ -1,13 +1,14 @@
 import { Feather } from '@expo/vector-icons';
 import React, { useState } from 'react';
-import { Alert, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { MosaicLogo } from '../components/Logo';
+// import { RNImage } from '../components';
+import MosaicLogo from '../components/mosaic_logo';
 import { MovieDetailModal } from '../components/MovieDetailModal';
-import { RNButton, RNImage } from '../components/UI';
-import { useApp } from '../context/AppContext.tsx/AppContext';
-import { mockMovies } from '../data/Mocks';
-import { showToast } from '../utils/Utils';
+import { RNButton } from '../components/RNButton';
+import { useApp } from '../context/AppContext';
+import { movies as mockMovies } from '../data/movies';
+import { styles } from '@/components/HomeScreen';
 
 const groupQuizQuestions = [
   { question: "🎬 What kind of movie night do you prefer?", options: ["Chill", "Intense", "Emotional", "Funny"] },
@@ -33,7 +34,7 @@ export default function HomeScreen() {
   const surpriseMe = mockMovies.slice(14, 20);
   const trending = mockMovies.slice(0, 6);
 
-  function calculateMatch(movie) {
+  function calculateMatch(movie: any) {
     if (!userData) return Math.floor(Math.random() * 30) + 70;
     const genreMatches = movie.genre.filter(g => userData.genres.includes(g)).length;
     return Math.min(95, 70 + (genreMatches * 8));
@@ -43,7 +44,7 @@ export default function HomeScreen() {
     setCurrentScreen('group-setup');
   }
 
-  function handleGroupClick(groupId) {
+  function handleGroupClick(groupId: any) {
     setSelectedGroupId(groupId);
     setShowGroupQuiz(false);
   }
@@ -52,7 +53,7 @@ export default function HomeScreen() {
     setShowGroupQuiz(true);
   }
 
-  function handleQuizAnswer(answer) {
+  function handleQuizAnswer(answer: any) {
     const newAnswers = [...quizAnswers, answer];
     setQuizAnswers(newAnswers);
 
@@ -87,17 +88,15 @@ export default function HomeScreen() {
     }
   }
 
-  function handleSaveMovie(movie) {
+  function handleSaveMovie(movie: any) {
     if (!userData) return;
     const isSaved = userData.savedMovies?.includes(movie.id);
     if (isSaved) {
       const newSaved = userData.savedMovies.filter(id => id !== movie.id);
       updateUserData({ savedMovies: newSaved });
-      showToast('Movie removed from saved');
     } else {
       const newSaved = [...(userData.savedMovies || []), movie.id];
       updateUserData({ savedMovies: newSaved });
-      showToast('Movie saved');
     }
   }
 
@@ -162,7 +161,7 @@ export default function HomeScreen() {
       <View style={styles.movieCard}>
         <TouchableOpacity onPress={() => setSelectedMovie(movie)} style={styles.movieCardButton}>
           <View style={styles.posterContainer}>
-            <RNImage src={movie.poster} alt={movie.title} style={styles.posterImage} />
+            <Image src={movie.poster} alt={movie.title} style={styles.posterImage} />
           </View>
         </TouchableOpacity>
         <View style={styles.matchBadge}>
@@ -282,9 +281,3 @@ export default function HomeScreen() {
     </View>
   );
 }
-
-//Keep styles the same 
-const styles = StyleSheet.create({
-  // come back here 
-});
-     

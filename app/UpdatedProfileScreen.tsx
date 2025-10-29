@@ -2,11 +2,11 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Award, Bell, Tv, User } from "lucide-react-native";
 import { useState } from "react";
 import {
-    ScrollView,
-    Switch,
-    Text,
-    TouchableOpacity,
-    View
+  ScrollView,
+  Switch,
+  Text,
+  TouchableOpacity,
+  View
 } from "react-native";
 import Svg, { Path } from "react-native-svg";
 import { useApp } from "../context/AppContext.tsx/AppContext";
