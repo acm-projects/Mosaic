@@ -1,12 +1,19 @@
-import React from 'react';
-import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Modal, Dimensions } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { RNImage } from './UI';
+import React from 'react';
+import { Dimensions, Image, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { height } = Dimensions.get('window');
 
+import { Movie } from '../types/types';
+
+interface MovieDetailModalProps {
+  movie: Movie;
+  matchScore: number;
+  onClose: () => void;
+}
+
 // --- Movie Detail Modal ---
-export const MovieDetailModal = ({ movie, matchScore, onClose }) => {
+export const MovieDetailModal = ({ movie, matchScore, onClose }: MovieDetailModalProps) => {
   if (!movie) return null;
     
   return (
@@ -22,15 +29,25 @@ export const MovieDetailModal = ({ movie, matchScore, onClose }) => {
             <Ionicons name="close" size={24} color="#fff" />
           </TouchableOpacity>
           <ScrollView>
-            <RNImage src={movie.backdrop} style={styles.detailBackdrop} alt={movie.title} />
+            {movie.backdrop ? (
+              <Image source={{ uri: movie.backdrop }} style={styles.detailBackdrop} resizeMode="cover" />
+            ) : (
+              <View style={[styles.detailBackdrop, { backgroundColor: '#1a1a1a' }]} />
+            )}
             <View style={styles.detailContent}>
               <Text style={styles.detailTitle}>{movie.title}</Text>
               <View style={styles.detailInfoRow}>
                 <Text style={styles.detailInfoText}>{movie.year}</Text>
                 <Text style={styles.detailInfoText}>•</Text>
-                <Text style={styles.detailInfoText}>{movie.runtime} min</Text>
-                <Text style={styles.detailInfoText}>•</Text>
-                <Text style={[styles.detailInfoText, { color: '#facc15' }]}>★ {movie.rating}</Text>
+                                {movie.runtime && (
+                  <>
+                    <Text style={styles.detailInfoText}>{movie.runtime} min</Text>
+                    <View style={styles.detailInfoDot} />
+                  </>
+                )}
+                {movie.rating && (
+                  <Text style={[styles.detailInfoText, { color: '#facc15' }]}>★ {movie.rating}</Text>
+                )}
               </View>
               <Text style={styles.detailDescription}>{movie.description}</Text>
               <View style={styles.detailMatchBadge}>
@@ -113,5 +130,12 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 14,
         fontWeight: '600',
+    },
+    detailInfoDot: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+        backgroundColor: '#666',
+        marginHorizontal: 8,
     },
 });

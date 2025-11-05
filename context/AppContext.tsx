@@ -1,109 +1,86 @@
-import React, { createContext, ReactNode, useCallback, useContext, useMemo, useState } from 'react';
-// Note: We assume Movie type is defined in a global or imported data file.
-
-// --- INTERFACES (TypeScript Definitions) ---
-
-interface Group {
-  id: string;
-  name: string;
-  avatar: string;
-  color: string;
-  members: string[];
-  sharedMovies: number[];
-  pendingInvites: string[];
-  quizCompleted?: string[];
-  hasGroupQuiz?: boolean;
-  topPicks?: number[];
-}
-
-interface Folder {
-  id: string;
-  name: string;
-  source: 'clips' | 'home' | 'discover';
-  movieIds: number[];
-  clipIds?: number[];
-}
-
-interface UserData {
-  username: string;
-  email: string;
-  genres: string[];
-  likedMovies: number[];
-  dislikedMovies: number[];
-  savedMovies: number[];
-  watchedMovies: number[];
-  bookmarkedMovies: number[];
-  groups: Group[];
-  streamingServices: string[];
-  level: number;
-  folders: Folder[];
-  selectedGroupForTopPicks?: string;
-}
-
-type Screen = 'auth' | 'signup' | 'create-account' | 'google-signup' | 'quiz' | 'swipe' | 'streaming-setup' | 'group-setup' | 'home' | 'clips' | 'discover' | 'saved' | 'groups' | 'profile' | 'group-top-picks';
+import { auth } from '@/lib/firebase_config';
+import { onAuthStateChanged } from 'firebase/auth';
+import React, { createContext, useContext, useEffect, useState } from 'react';
+import { AppScreen, UserData } from '../types/types';
 
 interface AppContextType {
-  currentScreen: Screen;
-  setCurrentScreen: (screen: Screen) => void;
-  previousScreen: Screen | null;
-  userData: UserData | null;
-  setUserData: (data: UserData | null) => void;
-  updateUserData: (data: Partial<UserData>) => void;
-  isReturningUser: boolean;
-  setIsReturningUser: (value: boolean) => void;
+    userData: UserData | null;
+    setCurrentScreen: (screen: AppScreen) => void;
+    updateUserData: (data: Partial<UserData>) => void;
+    loading: boolean;
 }
 
-// --- CONTEXT ---
-const AppContext = createContext<AppContextType | undefined>(undefined);
+const AppContext = createContext<AppContextType>({
+    userData: null,
+    setCurrentScreen: () => {},
+    updateUserData: () => {},
+    loading: true
+});
 
-export function AppProvider({ children }: { children: ReactNode }) {
-  // We explicitly type the state based on our interfaces
-  const [currentScreen, setCurrentScreen] = useState<Screen>('auth');
-  const [previousScreen, setPreviousScreen] = useState<Screen | null>(null);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [isReturningUser, setIsReturningUser] = useState(false);
+export const useApp = () => useContext(AppContext);
 
-  const handleSetCurrentScreen = useCallback((screen: Screen) => {
-    setPreviousScreen(currentScreen);
-    setCurrentScreen(screen);
-  }, [currentScreen]);
+export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const [userData, setUserData] = useState<UserData | null>(null);
+    const [currentScreen, setCurrentScreen] = useState<string>('home');
+    const [loading, setLoading] = useState(true);
 
-  const updateUserData = useCallback((data: Partial<UserData>) => {
-    setUserData(prev => {
-        if (!prev) return null;
-        return { ...prev, ...data };
-    });
-  }, []);
+    useEffect(() => {
+        console.log('Setting up auth state listener');
+        setLoading(true);
+        
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            console.log('Auth state changed:', user ? 'User logged in' : 'No user');
+            try {
+                if (user) {
+                    // Initialize with basic user data
+                    setUserData({
+                        id: user.uid,
+                        email: user.email || '',
+                        name: user.displayName || 'User',
+                        groups: [],
+                        watchedMovies: [],
+                        savedMovies: [],
+                        genres: []
+                    });
+                } else {
+                    setUserData(null);
+                }
+            } catch (error) {
+                console.error('Error setting user data:', error);
+                setUserData(null);
+            } finally {
+                setLoading(false);
+            }
+        }, (error) => {
+            console.error('Auth state change error:', error);
+            setLoading(false);
+        });
 
-  const contextValue = useMemo(() => ({
-    currentScreen,
-    setCurrentScreen: handleSetCurrentScreen,
-    previousScreen,
-    userData,
-    setUserData,
-    updateUserData,
-    isReturningUser,
-    setIsReturningUser
-  }), [
-    currentScreen,
-    handleSetCurrentScreen,
-    previousScreen,
-    userData,
-    updateUserData,
-    isReturningUser
-  ]);
+        // If auth listener doesn't fire within 10s, stop loading and warn
+        const timeout = setTimeout(() => {
+            console.error('Auth state listener did not respond within 10s — timing out.');
+            setLoading(false);
+        }, 10000);
 
-  return (
-    <AppContext.Provider value={contextValue}>
-      {children}
-    </AppContext.Provider>
-  );
-}
+        return () => {
+            console.log('Cleaning up auth state listener');
+            clearTimeout(timeout);
+            unsubscribe();
+        };
+    }, []);
 
-export function useApp(): AppContextType {
-  const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error('useApp must be used within AppProvider');
-  }
-  return context;
-}
+    const updateUserData = (data: Partial<UserData>) => {
+        setUserData(prev => prev ? { ...prev, ...data } : null);
+    };
+
+    return (
+        <AppContext.Provider value={{
+            userData,
+            setCurrentScreen,
+            updateUserData,
+            loading
+        }}>
+            {children}
+        </AppContext.Provider>
+    );
+};

@@ -1,14 +1,21 @@
 import LoadingPopup from '@/components/loading_popup';
 import PageBackground from '@/components/page_background';
 import { join_group } from '@/lib/firebase_firestore';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 export default function JoinGroupScreen() {
+    const { fromHome } = useLocalSearchParams();
     const [join_code, set_join_code] = useState('');
     const [loading, set_loading] = useState(false);
+    const [debugMsg, setDebugMsg] = useState<string>('');
+
+    useEffect(() => {
+        console.log('JoinGroupScreen mounted with params:', { fromHome });
+        setDebugMsg(`fromHome=${fromHome ?? 'undefined'}`);
+    }, [fromHome]);
 
     const handleJoin = async () => {
         if (join_code.length !== 6) return;
@@ -36,12 +43,24 @@ export default function JoinGroupScreen() {
             <LoadingPopup visible={loading} />
             {/* Back Button */}
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={() => {
+                    console.log('JoinGroupScreen back pressed, fromHome=', fromHome);
+                    setDebugMsg('Back pressed');
+                    try { router.back(); setDebugMsg('Attempted router.back()'); } catch (e) { console.warn(e); }
+                    setTimeout(() => {
+                        if (fromHome === '1') { setDebugMsg('Fallback -> /home'); router.replace('/home'); }
+                        else { setDebugMsg('Fallback -> /onboarding/groups'); router.replace('/onboarding/groups'); }
+                    }, 150);
+                }}
                 style={styles.backButton}
                 activeOpacity={0.7}
             >
                 <ArrowLeft size={20} color="white" />
             </TouchableOpacity>
+            {/* DEBUG OVERLAY */}
+            <View style={{ position: 'absolute', top: 24, left: 24, zIndex: 50 }}>
+                <Text style={{ color: 'white', fontSize: 12 }}>{debugMsg}</Text>
+            </View>
 
             {/* Title and subtitle */}
             <Text style={styles.title}>Join a Group</Text>

@@ -1,9 +1,9 @@
 // src/screens/GroupSetup/CreateGroupScreen.tsx
 import PageBackground from '@/components/page_background';
 import { create_group } from '@/lib/firebase_firestore';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Users } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
 const groupColors = [
@@ -12,8 +12,15 @@ const groupColors = [
 ];
 
 export default function CreateGroupScreen() {
+    const { fromHome } = useLocalSearchParams();
     const [groupName, setGroupName] = useState('');
     const [selectedColor, setSelectedColor] = useState(groupColors[0]);
+    const [debugMsg, setDebugMsg] = useState<string>('');
+
+    useEffect(() => {
+        console.log('CreateGroupScreen mounted with params:', { fromHome });
+        setDebugMsg(`fromHome=${fromHome ?? 'undefined'}`);
+    }, [fromHome]);
 
     function handleCreate() {
         if (!groupName) return;
@@ -31,12 +38,39 @@ export default function CreateGroupScreen() {
     }
       
 
+    function handleBack() {
+        console.log('CreateGroupScreen.handleBack called, fromHome=', fromHome);
+        setDebugMsg('Back pressed');
+        try {
+            router.back();
+            setDebugMsg('Attempted router.back()');
+        } catch (e) {
+            console.warn('router.back() threw', e);
+        }
+
+        // Fallback after short delay
+        setTimeout(() => {
+            console.log('CreateGroupScreen.handleBack fallback check, fromHome=', fromHome);
+            if (fromHome === '1') {
+                setDebugMsg('Fallback -> /home');
+                router.replace('/home');
+            } else {
+                setDebugMsg('Fallback -> /onboarding/groups');
+                router.replace('/onboarding/groups');
+            }
+        }, 150);
+    }
+
     return (
         <View style={styles.container}>
             <PageBackground />
+            {/* DEBUG OVERLAY - remove in production */}
+            <View style={{ position: 'absolute', top: 24, left: 24, zIndex: 50 }}>
+                <Text style={{ color: 'white', fontSize: 12 }}>{debugMsg}</Text>
+            </View>
             {/* Back Button */}
             <TouchableOpacity
-                onPress={() => router.back()}
+                onPress={handleBack}
                 style={styles.backButton}
                 activeOpacity={0.7}
             >
