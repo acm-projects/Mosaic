@@ -50,11 +50,17 @@ export default function SignUp() {
             return;
         }
 
+        set_loading(true);
+
         try {
-            set_loading(true);
             const result = await sign_up(email, password, username);
-            if (result === true) router.replace("/onboarding/quiz");
-            else if (typeof result == "string") set_error_message(result);
+
+            if (!result.ok) {
+                set_error_message(result.error);
+                return;
+            }
+
+            router.replace("/onboarding/quiz");
         } catch (error) {
             set_error_message("Something went wrong. Try again.");
         } finally {

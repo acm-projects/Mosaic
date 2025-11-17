@@ -4,7 +4,7 @@ import AuthInput from '@/components/auth_input';
 import LoadingPopup from '@/components/loading_popup';
 import MosaicLogo from '@/components/mosaic_logo';
 import PageBackground from '@/components/page_background';
-import { login, require_user } from '@/lib/auth';
+import { login } from '@/lib/auth';
 import { get_user_data } from '@/lib/firestore/users';
 import { styles } from '@/lib/styles';
 import { useRouter } from 'expo-router';
@@ -25,35 +25,45 @@ export default function Login() {
 
     const [error_message, set_error_message] = useState("");
 
-    function handle_login(): void {
+    async function handle_login(): Promise<void> {
         set_error_message("");
-
-        if (email === "" || password === "") {
+    
+        if (!email || !password) {
             set_error_message("Please fill in all fields.");
             return;
         }
-
+    
         set_loading(true);
-
-        login(email, password).then((result) => {
-            if (result === true) {
-                const user = require_user();
-                const user_data = get_user_data(user.uid);
-
-                user_data.then((data) => {
-                    if (typeof (data) == "object" && !data?.taken_quiz) {
-                        router.replace("/onboarding/quiz");
-                    } else {
-                        router.replace("/home");
-                    }
-                });
-            } else {
-                set_error_message(result as string);
+    
+        try {
+            const result = await login(email, password);
+    
+            if (!result.ok) {
+                set_error_message(result.error);
+                return;
             }
-        }).finally(() => {
+    
+            const user = result.data;
+    
+            const user_data = await get_user_data(user.uid);
+    
+            if (typeof user_data === "string") {
+                set_error_message(user_data);
+                return;
+            }
+    
+            if (user_data && !user_data.taken_quiz) {
+                router.replace("/onboarding/quiz");
+            } else {
+                router.replace("/home");
+            }
+        } catch (err) {
+            set_error_message("An unexpected error occurred.");
+        } finally {
             set_loading(false);
-        });
+        }
     }
+    
 
     return (
         <SafeAreaView style={styles.container}>
