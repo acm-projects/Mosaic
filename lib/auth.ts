@@ -1,10 +1,8 @@
 import { auth } from '@/lib/firebase_config';
 import { new_user } from '@/lib/firestore/users';
+import { Result } from '@/lib/types';
 import { AuthError, createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from 'firebase/auth';
 import { FirestoreError } from 'firebase/firestore';
-
-type Result<T> = { ok: true; data: T } | { ok: false; error: string, code: string };
-
 
 export async function login(email: string, password: string): Promise<Result<User>> {
     try {

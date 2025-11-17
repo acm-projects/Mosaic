@@ -1,6 +1,7 @@
+import { require_user } from "@/lib/auth";
 import { firestore } from "@/lib/firebase_config";
+import { Result } from "@/lib/types";
 import { addDoc, collection, doc, FirestoreError, getDoc, getDocs, query, runTransaction, setDoc, where } from "firebase/firestore";
-import { require_user } from "../auth";
 
 async function generate_join_code(): Promise<string> {
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -26,7 +27,7 @@ async function generate_join_code(): Promise<string> {
 export async function create_group(
     group_name: string,
     selected_color: string
-): Promise<string> {
+): Promise<Result<string>> {
     try {
         const user = require_user();
 
@@ -56,17 +57,21 @@ export async function create_group(
             { merge: true }
         );
 
-        return join_code;
+        return { ok: true, data: join_code };
     } catch (error) {
-        const message =
-            (error as FirestoreError)?.message || "Failed to create group";
-            
-        console.error("create_group error:", message);
-        return message;
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+
+        if (error instanceof FirestoreError) {
+            error_message = error.message;
+            error_code = error.code;
+        }
+
+        return { ok: false, error: error_message, code: error_code }
     }
 }
 
-export async function join_group(join_code: string): Promise<{ success: boolean; error?: string }> {
+export async function join_group(join_code: string): Promise<Result<boolean>> {
     try {
         const user = require_user();
 
@@ -75,7 +80,7 @@ export async function join_group(join_code: string): Promise<{ success: boolean;
         const query_snapshot = await getDocs(q);
 
         if (query_snapshot.empty) {
-            return { success: false, error: "Group not found" };
+            return { ok: false, error: "Invalid join code", code: "invalid_code" };
         }
 
         const group_doc = query_snapshot.docs[0];
@@ -106,10 +111,16 @@ export async function join_group(join_code: string): Promise<{ success: boolean;
             );
         });
 
-        return { success: true };
+        return { ok: true, data: true };
     } catch (error) {
-        const message = (error as FirestoreError)?.message || "Failed to join group";
-        console.error("join_group error:", message);
-        return { success: false, error: message };
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+
+        if (error instanceof FirestoreError) {
+            error_message = error.message;
+            error_code = error.code;
+        }
+
+        return { ok: false, error: error_message, code: error_code }
     }
 }

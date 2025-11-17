@@ -1,23 +1,31 @@
-import { User } from "@/lib/firestore/types";
-import { doc, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { Result, User } from "@/lib/types";
+import { doc, FirestoreError, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { firestore } from "../firebase_config";
 
-export async function get_user_data(uid: string): Promise<User | null | string> {
+export async function get_user_data(uid: string): Promise<Result<User>> {
     try {
         const user_ref = doc(firestore, "Users", uid);
         const user_snap = await getDoc(user_ref);
 
         if (user_snap.exists()) {
-            return user_snap.data() as User;
+            return { ok: true, data: (user_snap.data() as User) };
         } else {
-            return null;
+            return { ok: false, error: "No such user!", code: "404" };
         }
-    } catch (error: any) {
-        return error.message;
+    } catch (error) {
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+
+        if (error instanceof FirestoreError) {
+            error_message = error.message;
+            error_code = error.code;
+        }
+
+        return { ok: false, error: error_message, code: error_code }
     }
 }
 
-export async function new_user(uid: string, email: string, username: string) {
+export async function new_user(uid: string, email: string, username: string): Promise<Result<boolean>> {
     try {
         const user_ref = doc(firestore, "Users", uid);
 
@@ -34,13 +42,21 @@ export async function new_user(uid: string, email: string, username: string) {
             createdAt: serverTimestamp(),
         });
 
-        return true;
+        return { ok: true, data: true };
     } catch (error: any) {
-        return error.message;
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+
+        if (error instanceof FirestoreError) {
+            error_message = error.message;
+            error_code = error.code;
+        }
+
+        return { ok: false, error: error_message, code: error_code }
     }
 }
 
-export async function add_quiz(uid: string, favorite_genre: string[], mood: Record<string, string>) {
+export async function add_quiz(uid: string, favorite_genre: string[], mood: Record<string, string>): Promise<Result<boolean>> {
     try {
         const user_ref = doc(firestore, "Users", uid);
 
@@ -50,8 +66,16 @@ export async function add_quiz(uid: string, favorite_genre: string[], mood: Reco
             taken_quiz: true,
         }, { merge: true });
 
-        return true;
+        return { ok: true, data: true };
     } catch (error: any) {
-        return error.message;
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+
+        if (error instanceof FirestoreError) {
+            error_message = error.message;
+            error_code = error.code;
+        }
+
+        return { ok: false, error: error_message, code: error_code }
     }
 }
