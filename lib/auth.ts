@@ -1,34 +1,49 @@
 import { auth } from '@/lib/firebase_config';
 import { new_user } from '@/lib/firestore/users';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from 'firebase/auth';
+import { AuthError, createUserWithEmailAndPassword, signInWithEmailAndPassword, User, UserCredential } from 'firebase/auth';
+import { FirestoreError } from 'firebase/firestore';
 
-export function login(email: string, password: string): Promise<boolean | string> {
-    return signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
-        auth.updateCurrentUser(userCredential.user);
+type Result<T> = { ok: true; data: T } | { ok: false; error: string, code: string };
 
-        return true;
-    }).catch((error) => {
-        const error_code = error.code;
-        const error_message = error.message;
 
-        return error_message;
-    });
+export async function login(email: string, password: string): Promise<Result<UserCredential>> {
+    try {
+        const user_creds = await signInWithEmailAndPassword(auth, email, password);
+
+        return { ok: true, data: user_creds };
+    } catch (error) {
+        let error_message = "An unknown error occurred.";
+        let error_code = "unknown";
+
+        if ((error as AuthError).code) {
+            error_code = (error as AuthError).code;
+            error_message = (error as AuthError).message;
+        }
+
+        return { ok: false, error: error_message, code: error_code };
+    }
 }
 
-export function sign_up(email: string, password: string, username: string): Promise<boolean | string> {
-    return createUserWithEmailAndPassword(auth, email, password).then((userCredential) => {
-        auth.updateCurrentUser(userCredential.user);
+export async function sign_up(email: string, password: string, username: string): Promise<Result<UserCredential>> {
+    try {
+        const user_creds = await createUserWithEmailAndPassword(auth, email, password);
+        await new_user(user_creds.user.uid, user_creds.user.email!, username);
 
-        console.log(userCredential.user.uid);
-        new_user(userCredential.user.uid, userCredential.user.email!, username);
+        return { ok: true, data: user_creds};
+    } catch (error) {
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+        
+        if ((error as AuthError).code) {
+            error_message = (error as AuthError).message;
+            error_code = (error as AuthError).code;
+        } else if ((error as FirestoreError).code) {
+            error_message = (error as FirestoreError).message;
+            error_code = (error as FirestoreError).code;
+        }
 
-        return true;
-    }).catch((error) => {
-        const error_code = error.code;
-        const error_message = error.message;
-
-        return error_message;
-    });
+        return { ok: false,  error: error_message, code: error_code};
+    }
 }
 
 export function require_user(): User {
