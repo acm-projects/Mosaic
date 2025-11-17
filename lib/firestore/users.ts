@@ -1,14 +1,14 @@
-import { Result, User } from "@/lib/types";
+import { FirestoreUser, Result } from "@/lib/types";
 import { doc, FirestoreError, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
 import { firestore } from "../firebase_config";
 
-export async function get_user_data(uid: string): Promise<Result<User>> {
+export async function get_user_data(uid: string): Promise<Result<FirestoreUser>> {
     try {
         const user_ref = doc(firestore, "Users", uid);
         const user_snap = await getDoc(user_ref);
 
         if (user_snap.exists()) {
-            return { ok: true, data: (user_snap.data() as User) };
+            return { ok: true, data: (user_snap.data() as FirestoreUser) };
         } else {
             return { ok: false, error: "No such user!", code: "404" };
         }

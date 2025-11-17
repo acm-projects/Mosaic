@@ -1,6 +1,6 @@
 export type Result<T> = { ok: true; data: T } | { ok: false; error: string; code: string };
 
-export interface User {
+export type FirestoreUser = {
     email: string;
     username: string;
     groups: string[];
@@ -54,4 +54,26 @@ export type MovieDetails = {
     video: boolean;
     vote_average: number;
     vote_count: number;
+};
+
+export type DiscoverMovieResult = {
+    page: number;
+    results: Array<{
+        adult: boolean;
+        backdrop_path: string;
+        genre_ids: number[];
+        id: number;
+        original_language: string;
+        original_title: string;
+        overview: string;
+        popularity: number;
+        poster_path: string;
+        release_date: string;
+        title: string;
+        video: boolean;
+        vote_average: number;
+        vote_count: number;
+    }>;
+    total_pages: number;
+    total_results: number;
 };

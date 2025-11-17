@@ -1,7 +1,6 @@
-import { MovieDetails } from "@/lib/types";
-import { Alert } from "react-native";
+import { DiscoverMovieResult, MovieDetails, Result } from "@/lib/types";
 
-export async function get_movie_by_code(code: number): Promise<MovieDetails | null> {
+export async function get_movie_by_code(code: number): Promise<Result<MovieDetails>> {
     try {
         const response = await fetch(`https://api.themoviedb.org/3/movie/${code}`, {
             method: 'GET',
@@ -12,19 +11,17 @@ export async function get_movie_by_code(code: number): Promise<MovieDetails | nu
         });
 
         if (!response.ok) {
-            Alert.alert('Error', 'Failed to fetch movie data: ' + response.statusText);
-            return null;
+            return { ok: false, error: response.statusText, code: "404" };
         }
 
         const data = (await response.json()) as MovieDetails;
-        return data;
+        return { ok: true, data: data };
     } catch (err: any) {
-        Alert.alert('Error', 'Failed to fetch movie data: ' + err.message);
-        return null;
+        return { ok: false, error: err.message, code: err.code };
     }
 }
 
-export async function get_movies_by_genre(genre: string[], and_or: 'and' | 'or' = 'and'): Promise<MovieDetails[] | null> {
+export async function get_movies_by_genre(genre: string[], and_or: 'and' | 'or' = 'and'): Promise<Result<MovieDetails[]>> {
     try {
         const with_genres = and_or === 'and' ? genre.join(',') : genre.join('|');
 
@@ -37,30 +34,30 @@ export async function get_movies_by_genre(genre: string[], and_or: 'and' | 'or' 
         });
 
         if (!response.ok) {
-            Alert.alert('Error', 'Failed to fetch movie data: ' + response.statusText);
-            return null;
+            return { ok: false, error: response.statusText, code: "404" };
         }
 
-        const data = await response.json();
+        const data = await response.json() as DiscoverMovieResult;
         const movie_ids: MovieDetails[] = [];
         let count = 0;
 
         for (let i = 0; i < data.results.length; i++) {
-            get_movie_by_code(data.results[i].id).then((movie) => {
-                if (movie != null) {
-                    movie_ids.push(movie);
-                    count++;
-                }
-            });
+            const result = await get_movie_by_code(data.results[i].id);
+            if (!result.ok) {
+                console.log(`Failed to fetch movie with ID ${data.results[i].id}: ${result.error}`);
+                continue;
+            } else {
+                movie_ids.push(result.data);
+                count++;
+            }
 
             if (count >= 10) {
                 break;
             }
         }
 
-        return movie_ids;
+        return { ok: true, data: movie_ids };
     } catch (err: any) {
-        Alert.alert('Error', 'Failed to fetch movie data: ' + err.message);
-        return null;
+        return { ok: false, error: err.message, code: err.code };
     }
 }
