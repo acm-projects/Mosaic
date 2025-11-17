@@ -1,6 +1,6 @@
 import { auth } from '@/lib/firebase_config';
-import { new_user } from '@/lib/firebase_firestore';
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth';
+import { new_user } from '@/lib/firestore/users';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, User } from 'firebase/auth';
 
 export function login(email: string, password: string): Promise<boolean | string> {
     return signInWithEmailAndPassword(auth, email, password).then((userCredential) => {
@@ -29,4 +29,12 @@ export function sign_up(email: string, password: string, username: string): Prom
 
         return error_message;
     });
+}
+
+export function require_user(): User {
+    const user = auth.currentUser;
+
+    if (!user) throw new Error("User not authenticated");
+
+    return user;
 }
