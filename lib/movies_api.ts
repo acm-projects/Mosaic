@@ -1,6 +1,13 @@
+import { get_cached_movie } from "@/lib/cache";
 import { DiscoverMovieResult, MovieDetails, Result } from "@/lib/types";
 
 export async function get_movie_by_code(code: number): Promise<Result<MovieDetails>> {
+    const cache_result = await get_cached_movie(code);
+
+    if (cache_result.ok) {
+        return cache_result;
+    }
+
     try {
         const response = await fetch(`https://api.themoviedb.org/3/movie/${code}`, {
             method: 'GET',
@@ -37,7 +44,7 @@ export async function get_movies_by_genre(genre: string[], and_or: 'and' | 'or' 
             return { ok: false, error: response.statusText, code: "404" };
         }
 
-        const data = await response.json() as DiscoverMovieResult;
+        const data = (await response.json()) as DiscoverMovieResult;
         const movie_ids: MovieDetails[] = [];
         let count = 0;
 
