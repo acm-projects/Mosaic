@@ -4,9 +4,8 @@ import AuthInput from '@/components/auth_input';
 import LoadingPopup from '@/components/loading_popup';
 import MosaicLogo from '@/components/mosaic_logo';
 import PageBackground from '@/components/page_background';
-import { login } from '@/lib/firebase_auth';
-import { auth } from '@/lib/firebase_config';
-import { get_user_data } from '@/lib/firebase_firestore';
+import { login, require_user } from '@/lib/auth';
+import { get_user_data } from '@/lib/firestore/users';
 import { styles } from '@/lib/styles';
 import { useRouter } from 'expo-router';
 import { MotiText, MotiView } from 'moti';
@@ -38,8 +37,8 @@ export default function Login() {
 
         login(email, password).then((result) => {
             if (result === true) {
-                const user = auth.currentUser;
-                const user_data = get_user_data(user!.uid);
+                const user = require_user();
+                const user_data = get_user_data(user.uid);
 
                 user_data.then((data) => {
                     if (typeof (data) == "object" && !data?.taken_quiz) {

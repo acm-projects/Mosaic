@@ -3,7 +3,7 @@ import AuthInput from "@/components/auth_input";
 import LoadingPopup from "@/components/loading_popup";
 import MosaicLogo from "@/components/mosaic_logo";
 import PageBackground from "@/components/page_background";
-import { sign_up } from "@/lib/firebase_auth";
+import { sign_up } from "@/lib/auth";
 import { styles } from "@/lib/styles";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
