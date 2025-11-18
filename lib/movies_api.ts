@@ -68,3 +68,17 @@ export async function get_movies_by_genre(genre: string[], and_or: 'and' | 'or' 
         return { ok: false, error: err.message, code: err.code };
     }
 }
+
+export async function fetch_movies_for_genres(genres: string[]) {
+    const [and_res, or_res] = await Promise.all([
+        get_movies_by_genre(genres, "and"),
+        get_movies_by_genre(genres, "or"),
+    ]);
+
+    if (!and_res.ok || !or_res.ok) return [];
+
+    const unique = new Map();
+    [...and_res.data, ...or_res.data].forEach(m => unique.set(m.id, m));
+
+    return Array.from(unique.values());
+}
