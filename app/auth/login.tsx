@@ -47,12 +47,12 @@ export default function Login() {
     
             const user_data = await get_user_data(user.uid);
     
-            if (typeof user_data === "string") {
-                set_error_message(user_data);
+            if (!user_data.ok) {
+                set_error_message(user_data.error);
                 return;
             }
     
-            if (user_data && !user_data.taken_quiz) {
+            if (!user_data.data.taken_quiz) {
                 router.replace("/onboarding/quiz");
             } else {
                 router.replace("/home");
