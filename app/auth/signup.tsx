@@ -4,7 +4,7 @@ import LoadingPopup from "@/components/loading_popup";
 import MosaicLogo from "@/components/mosaic_logo";
 import PageBackground from "@/components/page_background";
 import { sign_up } from "@/lib/auth";
-import { styles } from "@/lib/styles";
+import { base_styles, form_styles, theme } from "@/lib/styles";
 import { router } from "expo-router";
 import { ArrowLeft } from "lucide-react-native";
 import { MotiView } from "moti";
@@ -13,8 +13,9 @@ import {
     KeyboardAvoidingView,
     Platform,
     ScrollView,
+    StyleSheet,
     Text,
-    View,
+    View
 } from "react-native";
 import { Easing } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -69,7 +70,7 @@ export default function SignUp() {
     }
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={base_styles.container}>
             <LoadingPopup visible={loading} />
             <PageBackground />
 
@@ -79,26 +80,15 @@ export default function SignUp() {
                 keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
             >
                 <ScrollView
-                    contentContainerStyle={{
-                        flexGrow: 1,
-                        justifyContent: "center",
-                        paddingBottom: 40,
-                    }}
+                    contentContainerStyle={styles.scrollContent}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <View style={styles.login_container}>
+                    <View style={base_styles.centerContainer}>
                         <ArrowLeft
                             size={24}
                             color={"white"}
-                            style={{
-                                position: "absolute",
-                                top: 40,
-                                left: 20,
-                                zIndex: 20,
-                            }}
-                            onPress={() => {
-                                router.back();
-                            }}
+                            style={styles.backButton}
+                            onPress={() => router.back()}
                         />
 
                         <MosaicLogo size="lg" />
@@ -112,9 +102,9 @@ export default function SignUp() {
                                 delay: 200,
                                 easing: Easing.bezier(0.23, 1, 0.32, 1),
                             }}
-                            style={{ width: "100%", gap: 12 }}
+                            style={styles.formWrapper}
                         >
-                            <View style={styles.form_container}>
+                            <View style={form_styles.container}>
                                 <AuthInput
                                     label="Email"
                                     value={email}
@@ -143,14 +133,7 @@ export default function SignUp() {
                                 />
 
                                 {error_message ? (
-                                    <Text
-                                        style={{
-                                            color: "#c10007",
-                                            fontWeight: "600",
-                                            fontSize: 12,
-                                            opacity: 0.75,
-                                        }}
-                                    >
+                                    <Text style={form_styles.errorText}>
                                         {error_message}
                                     </Text>
                                 ) : null}
@@ -164,3 +147,21 @@ export default function SignUp() {
         </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+    scrollContent: {
+      flexGrow: 1,
+      justifyContent: "center",
+      paddingBottom: theme.spacing.xxxl,
+    },
+    backButton: {
+      position: "absolute",
+      top: theme.spacing.xxxl,
+      left: 20,
+      zIndex: 20,
+    },
+    formWrapper: {
+      width: "100%",
+      gap: theme.spacing.md,
+    },
+  });

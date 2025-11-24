@@ -6,11 +6,11 @@ import MosaicLogo from '@/components/mosaic_logo';
 import PageBackground from '@/components/page_background';
 import { login } from '@/lib/auth';
 import { get_user_data } from '@/lib/firestore/users';
-import { styles } from '@/lib/styles';
+import { base_styles, button_styles, divider_styles, form_styles, theme } from '@/lib/styles';
 import { useRouter } from 'expo-router';
 import { MotiText, MotiView } from 'moti';
 import { useState } from "react";
-import { Text, TouchableOpacity, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Easing } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
@@ -27,31 +27,31 @@ export default function Login() {
 
     async function handle_login(): Promise<void> {
         set_error_message("");
-    
+
         if (!email || !password) {
             set_error_message("Please fill in all fields.");
             return;
         }
-    
+
         set_loading(true);
-    
+
         try {
             const result = await login(email, password);
-    
+
             if (!result.ok) {
                 set_error_message(result.error);
                 return;
             }
-    
+
             const user = result.data;
-    
+
             const user_data = await get_user_data(user.uid);
-    
+
             if (!user_data.ok) {
                 set_error_message(user_data.error);
                 return;
             }
-    
+
             if (!user_data.data.taken_quiz) {
                 router.replace("/onboarding/quiz");
             } else {
@@ -63,32 +63,28 @@ export default function Login() {
             set_loading(false);
         }
     }
-    
 
     return (
-        <SafeAreaView style={styles.container}>
+        <SafeAreaView style={base_styles.container}>
             <LoadingPopup visible={loading} />
 
-            {/* Background Gradient */}
             <PageBackground />
 
-            {/* Login Container */}
-            <View style={styles.login_container}>
-                {/* Logo and Subtitle */}
+            <View style={[base_styles.centerContainer, styles.container]}>
                 <MosaicLogo size="lg" />
 
-                {/* Form */}
                 <MotiView
                     from={{ opacity: 0, transform: [{ translateY: 30 }] }}
                     animate={{ opacity: 1, transform: [{ translateY: 0 }] }}
-                    transition={{ type: "timing", duration: 800, delay: 200, easing: Easing.bezier(0.23, 1, 0.32, 1) }}
-                    style={{
-                        width: "100%",
-                        gap: 12,
+                    transition={{
+                        type: "timing",
+                        duration: 800,
+                        delay: 200,
+                        easing: Easing.bezier(0.23, 1, 0.32, 1)
                     }}
+                    style={styles.form_wrapper}
                 >
-                    <View style={styles.form_container}>
-                        {/* Email/Username Input */}
+                    <View style={form_styles.container}>
                         <AuthInput
                             label="Email or Username"
                             placeholder="Enter your email or username"
@@ -96,7 +92,6 @@ export default function Login() {
                             onChangeText={set_email}
                         />
 
-                        {/* Password Input */}
                         <AuthInput
                             label="Password"
                             placeholder="Enter your password"
@@ -105,39 +100,32 @@ export default function Login() {
                             secureTextEntry={true}
                         />
 
-                        {error_message != "" && <View style={{ marginBottom: 10, alignItems: "center" }}>
-                            <Text style={{
-                                color: "#c10007",
-                                fontWeight: "semibold",
-                                fontSize: 12,
-                                opacity: 0.75,
-                            }}>
-                                {error_message}
-                            </Text>
-                        </View>}
+                        {error_message !== "" && (
+                            <View style={form_styles.errorContainer}>
+                                <Text style={form_styles.errorText}>
+                                    {error_message}
+                                </Text>
+                            </View>
+                        )}
 
-                        {/* Login Button */}
                         <AuthButton onPress={handle_login} text='Sign In' />
 
-                        {/* Divider */}
-                        <View style={{ marginVertical: 32, flexDirection: "row", alignItems: "center" }}>
-                            <View style={{ flex: 1, height: 1, backgroundColor: "#334155" }} />
-                            <Text style={{ marginHorizontal: 12, color: "#64748B", fontWeight: "500" }}>
+                        <View style={divider_styles.container}>
+                            <View style={divider_styles.line} />
+                            <Text style={divider_styles.text}>
                                 Or continue with
                             </Text>
-                            <View style={{ flex: 1, height: 1, backgroundColor: "#334155" }} />
+                            <View style={divider_styles.line} />
                         </View>
 
-                        {/* Google Button */}
-                        <View style={{ gap: 12 }}>
+                        <View style={styles.google_button_container}>
                             <TouchableOpacity
                                 style={[
-                                    styles.google_button_base,
-                                    pressed_google ? styles.google_button_hover : styles.google_button
+                                    button_styles.googleBase,
+                                    pressed_google ? button_styles.googleHover : button_styles.google
                                 ]}
                                 onPressIn={() => set_pressed_google(true)}
                                 onPressOut={() => set_pressed_google(false)}
-                                // onPress={handle_google_signin}
                                 activeOpacity={1}
                             >
                                 <GoogleSVG width={20} height={20} style={{ marginRight: 12 }} />
@@ -147,21 +135,15 @@ export default function Login() {
                             </TouchableOpacity>
                         </View>
 
-                        {/* Sign Up Link */}
                         <MotiText
-                            style={{
-                                textAlign: "center",
-                                marginTop: 16,
-                                color: "#64748B",
-                                fontSize: 14,
-                            }}
+                            style={styles.signup_prompt}
                             from={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                             transition={{ delay: 500 }}
                         >
                             Don't have an account?{' '}
                             <Text
-                                style={{ color: "#818cf8", fontWeight: "500" }}
+                                style={styles.signup_link}
                                 onPress={() => router.navigate("/auth/signup")}
                             >
                                 Sign up
@@ -173,3 +155,27 @@ export default function Login() {
         </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        padding: theme.spacing.xs,
+        zIndex: 10,
+    },
+    form_wrapper: {
+        width: "100%",
+        gap: theme.spacing.md,
+    },
+    google_button_container: {
+        gap: theme.spacing.md,
+    },
+    signup_prompt: {
+        textAlign: "center",
+        marginTop: theme.spacing.lg,
+        color: theme.colors.text.muted,
+        fontSize: 14,
+    },
+    signup_link: {
+        color: theme.colors.text.accent,
+        fontWeight: "500",
+    },
+});
