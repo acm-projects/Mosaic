@@ -1,5 +1,5 @@
 import { get_cached_movie } from "@/lib/cache";
-import { DiscoverMovieResult, MovieDetails, Result } from "@/lib/types";
+import { DiscoverMovieResult, Genres, MovieDetails, Result } from "@/lib/types";
 
 export async function get_movie_by_code(code: number): Promise<Result<MovieDetails>> {
     const cache_result = await get_cached_movie(code);
@@ -30,7 +30,8 @@ export async function get_movie_by_code(code: number): Promise<Result<MovieDetai
 
 export async function get_movies_by_genre(genre: string[], and_or: 'and' | 'or' = 'and'): Promise<Result<MovieDetails[]>> {
     try {
-        const with_genres = and_or === 'and' ? genre.join(',') : genre.join('|');
+        const genre_codes = genre.map(g => Genres[g as keyof typeof Genres]).filter(code => code !== undefined) as number[];
+        const with_genres = and_or === 'and' ? genre_codes.join(',') : genre_codes.join('|');
 
         const response = await fetch(`https://api.themoviedb.org/3/discover/movie?language=en-US&page=1&sort_by=popularity.desc&with_genres=${with_genres}`, {
             method: 'GET',
@@ -69,13 +70,15 @@ export async function get_movies_by_genre(genre: string[], and_or: 'and' | 'or' 
     }
 }
 
-export async function fetch_movies_for_genres(genres: string[]) {
+export async function fetch_movies_for_genres(genres: string[]): Promise<MovieDetails[]> {
     const [and_res, or_res] = await Promise.all([
         get_movies_by_genre(genres, "and"),
         get_movies_by_genre(genres, "or"),
     ]);
 
-    if (!and_res.ok || !or_res.ok) return [];
+    if (!and_res.ok || !or_res.ok) {
+        return [];
+    };
 
     const unique = new Map();
     [...and_res.data, ...or_res.data].forEach(m => unique.set(m.id, m));
