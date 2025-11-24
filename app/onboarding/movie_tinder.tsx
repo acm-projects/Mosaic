@@ -1,21 +1,94 @@
-import MovieCard from '@/components/movie_card';
+import LoadingPopup from '@/components/loading_popup';
+import MovieCard from '@/components/movie_swipe_card';
 import PageBackground from '@/components/page_background';
+import { require_user } from '@/lib/auth';
+import { update_favorite_movies } from '@/lib/firestore/users';
+import { fetch_movies_for_genres } from '@/lib/movies_api';
+import { MovieDetails } from '@/lib/types';
+import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Heart, RotateCcw, X } from 'lucide-react-native';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
-export default function SwipeScreen() {
-    const [rated_count, set_rated_count] = useState(3);
+export default function FavoriteMovies() {
+    const [rated_count, set_rated_count] = useState(0);
+    const [movie_idx, set_movie_idx] = useState(0);
+    const [movies, set_movies] = useState<MovieDetails[]>([]);
+    const [favorite_movies, set_favorite_movies] = useState<number[]>([]);
+    const [loading, set_loading] = useState(false);
+    const { favorite_genres } = useLocalSearchParams();
+
+    useEffect(() => {
+        async function fetch() {
+            set_loading(true);
+
+            const genres = JSON.parse(favorite_genres as string);
+            const movies = await fetch_movies_for_genres(genres);
+
+            console.log(movies);
+
+            set_movies(movies);
+            set_loading(false);
+        }
+
+        fetch();
+    }, []);
+
+    function handle_swipe(dir: 'left' | 'right' | 'skip') {
+        switch (dir) {
+            case 'right':
+                set_favorite_movies([...favorite_movies, movies[movie_idx].id]);
+                set_rated_count(rated_count + 1);
+                set_movie_idx(movie_idx + 1);
+                break;
+            case 'left':
+                set_rated_count(rated_count + 1);
+                set_movie_idx(movie_idx + 1);
+                break;
+            case 'skip':
+                set_movie_idx(movie_idx + 1);
+                break;
+        }
+    }
+
+    async function handle_finish() {
+        console.log('Finished rating movies. Favorite movies: ', favorite_movies);
+
+        const user = require_user();
+        const result = await update_favorite_movies(user.uid, favorite_movies);
+
+        if (!result.ok) {
+            console.log('Failed to update favorite movies: ', result.error);
+            return;
+        }
+    }
+
+    function render_movie_card() {
+        if (rated_count === 10) {
+            handle_finish();
+            return null
+        }
+        if (!movies[movie_idx]) return null;
+
+        return (
+            <MovieCard
+                movie_data={movies[movie_idx]}
+                on_swipe={handle_swipe}
+            />
+        );
+    }
+
 
     return (
         <View style={styles.container}>
             <PageBackground />
+            <LoadingPopup visible={loading} />
 
             {/* Back Button */}
             <TouchableOpacity style={styles.backButton}>
-                <ArrowLeft color="white" size={20} />
+                <ArrowLeft color="white" size={20} onPress={() => router.back()} />
             </TouchableOpacity>
 
             {/* Progress Section */}
@@ -32,7 +105,7 @@ export default function SwipeScreen() {
 
             <View style={styles.mainContent}>
                 {/* Movie Card */}
-                <MovieCard />
+                {render_movie_card()}
 
                 {/* Action Buttons */}
                 <View style={styles.buttonRow}>
