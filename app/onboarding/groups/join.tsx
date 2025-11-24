@@ -1,6 +1,6 @@
 import LoadingPopup from '@/components/loading_popup';
 import PageBackground from '@/components/page_background';
-import { join_group } from '@/lib/firebase_firestore';
+import { join_group } from '@/lib/firestore/groups';
 import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
 import React, { useState } from 'react';
@@ -17,7 +17,7 @@ export default function JoinGroupScreen() {
         try {
             const result = await join_group(join_code);
 
-            if (result.success) {
+            if (result.ok) {
                 router.replace('/home');
             } else {
                 Alert.alert('Error', result.error || 'Failed to join group.');

@@ -1,4 +1,3 @@
-// src/screens/GroupSetup/InviteGroupScreen.tsx
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
 import { ArrowLeft, Copy, Users } from 'lucide-react-native';
