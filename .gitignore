@@ -44,3 +44,4 @@ app-example
 /android
 
 google-services.json
+.env
