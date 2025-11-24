@@ -79,3 +79,25 @@ export async function add_quiz(uid: string, favorite_genre: string[], mood: Reco
         return { ok: false, error: error_message, code: error_code }
     }
 }
+
+export async function update_favorite_movies(uid: string, favorite_movies: number[]): Promise<Result<boolean>> {
+    try {
+        const user_ref = doc(firestore, "Users", uid);
+
+        await setDoc(user_ref, {
+            favorite_movies,
+        }, { merge: true });
+
+        return { ok: true, data: true };
+    } catch (error: any) {
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+
+        if (error instanceof FirestoreError) {
+            error_message = error.message;
+            error_code = error.code;
+        }
+
+        return { ok: false, error: error_message, code: error_code }
+    }
+}
