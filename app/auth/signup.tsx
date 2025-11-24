@@ -80,14 +80,14 @@ export default function SignUp() {
                 keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
             >
                 <ScrollView
-                    contentContainerStyle={styles.scrollContent}
+                    contentContainerStyle={styles.scroll_content}
                     keyboardShouldPersistTaps="handled"
                 >
-                    <View style={base_styles.centerContainer}>
+                    <View style={base_styles.center_container}>
                         <ArrowLeft
                             size={24}
                             color={"white"}
-                            style={styles.backButton}
+                            style={styles.back_button}
                             onPress={() => router.back()}
                         />
 
@@ -102,7 +102,7 @@ export default function SignUp() {
                                 delay: 200,
                                 easing: Easing.bezier(0.23, 1, 0.32, 1),
                             }}
-                            style={styles.formWrapper}
+                            style={styles.form_wrapper}
                         >
                             <View style={form_styles.container}>
                                 <AuthInput
@@ -133,7 +133,7 @@ export default function SignUp() {
                                 />
 
                                 {error_message ? (
-                                    <Text style={form_styles.errorText}>
+                                    <Text style={form_styles.error_text}>
                                         {error_message}
                                     </Text>
                                 ) : null}
@@ -149,19 +149,19 @@ export default function SignUp() {
 }
 
 const styles = StyleSheet.create({
-    scrollContent: {
-      flexGrow: 1,
-      justifyContent: "center",
-      paddingBottom: theme.spacing.xxxl,
+    scroll_content: {
+        flexGrow: 1,
+        justifyContent: "center",
+        paddingBottom: theme.spacing.xxxl,
     },
-    backButton: {
-      position: "absolute",
-      top: theme.spacing.xxxl,
-      left: 20,
-      zIndex: 20,
+    back_button: {
+        position: "absolute",
+        top: theme.spacing.xxxl,
+        left: 20,
+        zIndex: 20,
     },
-    formWrapper: {
-      width: "100%",
-      gap: theme.spacing.md,
+    form_wrapper: {
+        width: "100%",
+        gap: theme.spacing.md,
     },
-  });
+});

@@ -6,14 +6,14 @@ export const base_styles = StyleSheet.create({
         overflow: "hidden",
         position: "relative",
     },
-    centerContainer: {
+    center_container: {
         flex: 1,
         flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
         position: "relative",
     },
-    absoluteFill: {
+    absolute_fill: {
         ...StyleSheet.absoluteFillObject,
         overflow: "hidden",
     },

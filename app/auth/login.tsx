@@ -70,7 +70,7 @@ export default function Login() {
 
             <PageBackground />
 
-            <View style={[base_styles.centerContainer, styles.container]}>
+            <View style={[base_styles.center_container, styles.container]}>
                 <MosaicLogo size="lg" />
 
                 <MotiView
@@ -101,8 +101,8 @@ export default function Login() {
                         />
 
                         {error_message !== "" && (
-                            <View style={form_styles.errorContainer}>
-                                <Text style={form_styles.errorText}>
+                            <View style={form_styles.error_container}>
+                                <Text style={form_styles.error_text}>
                                     {error_message}
                                 </Text>
                             </View>
@@ -121,8 +121,8 @@ export default function Login() {
                         <View style={styles.google_button_container}>
                             <TouchableOpacity
                                 style={[
-                                    button_styles.googleBase,
-                                    pressed_google ? button_styles.googleHover : button_styles.google
+                                    button_styles.google_base,
+                                    pressed_google ? button_styles.google_hover : button_styles.google
                                 ]}
                                 onPressIn={() => set_pressed_google(true)}
                                 onPressOut={() => set_pressed_google(false)}
