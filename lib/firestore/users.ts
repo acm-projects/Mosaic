@@ -56,7 +56,7 @@ export async function new_user(uid: string, email: string, username: string): Pr
     }
 }
 
-export async function add_quiz(uid: string, favorite_genre: string[], mood: Record<string, string>): Promise<Result<boolean>> {
+export async function add_quiz(uid: string, favorite_genre: string[], mood: Record<string, string>, providers: string[]): Promise<Result<boolean>> {
     try {
         const user_ref = doc(firestore, "Users", uid);
 
@@ -64,6 +64,8 @@ export async function add_quiz(uid: string, favorite_genre: string[], mood: Reco
             favorite_genre,
             mood,
             taken_quiz: true,
+            done_movie_swipe: false,
+            providers,
         }, { merge: true });
 
         return { ok: true, data: true };

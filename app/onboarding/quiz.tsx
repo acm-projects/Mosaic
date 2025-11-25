@@ -1,4 +1,4 @@
-import GenreSelector from "@/components/genre_selector";
+import GridOptionSelector from "@/components/grid_option_selector";
 import LoadingPopup from "@/components/loading_popup";
 import MoodSelector from "@/components/mood_selector";
 import PageBackground from "@/components/page_background";
@@ -14,24 +14,68 @@ import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from "react-nati
 import { Easing } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
+const GENRES = [
+    { name: "Action", emoji: "💥" },
+    { name: "Comedy", emoji: "😂" },
+    { name: "Drama", emoji: "🎭" },
+    { name: "Horror", emoji: "👻" },
+    { name: "Sci-Fi", emoji: "🚀" },
+    { name: "Romance", emoji: "❤️" },
+    { name: "Thriller", emoji: "😱" },
+    { name: "Animation", emoji: "🎨" },
+    { name: "Documentary", emoji: "📹" },
+    { name: "Fantasy", emoji: "🧙" },
+    { name: "Mystery", emoji: "🔍" },
+    { name: "Adventure", emoji: "🗺️" },
+]
+
+const STREAMING_PROVIDERS = [
+    { name: "Netflix", emoji: "N", color: "#E50914" },
+    { name: "Disney+", emoji: "D+", color: "#113CCF" },
+    { name: "HBO Max", emoji: "HBO", color: "#6C5CE7" },
+    { name: "Amazon Prime", emoji: "P", color: "#00A8E1" },
+    { name: "Hulu", emoji: "H", color: "#1CE783" },
+    { name: "Apple TV+", emoji: "TV+", color: "#000000" },
+    { name: "Paramount+", emoji: "P+", color: "#0064FF" },
+    { name: "Peacock", emoji: "P", color: "#6C2C91" },
+    { name: "Showtime", emoji: "SHO", color: "#FF0000" },
+]
+
 export default function QuizScreen() {
     const [step, set_step] = useState(1);
     const [selected_genres, set_selected_genres] = useState<string[]>([]);
     const [mood_answers, set_mood_answers] = useState<Record<string, string>>({});
+    const [selected_providers, set_selected_providers] = useState<string[]>([]);
     const [loading, set_loading] = useState(false);
 
     function toggle_genre(genre: string) {
-        set_selected_genres((prev) => 
-            prev.includes(genre) 
-                ? prev.filter((g) => g !== genre) 
-                : (prev.length < 3 ? [...prev, genre] : prev)
+        set_selected_genres((prev) =>
+            prev.includes(genre)
+                ? prev.filter((g) => g !== genre)
+                : [...prev, genre]
+        );
+    }
+
+    function toggle_provider(provider: string) {
+        set_selected_providers((prev) =>
+            prev.includes(provider)
+                ? prev.filter((p) => p !== provider)
+                : [...prev, provider]
         );
     }
 
     function handle_continue() {
-        if (step === 1 && selected_genres.length === 3) {
+        if (step === 1 && selected_genres.length >= 3) {
             set_step(2);
         } else if (step === 2 && Object.keys(mood_answers).length === 3) {
+            set_step(3);
+        } else if (step === 3) {
+            handle_finish();
+        }
+    }
+
+    function handle_skip() {
+        if (step === 3) {
             handle_finish();
         }
     }
@@ -40,7 +84,7 @@ export default function QuizScreen() {
         try {
             set_loading(true);
             const user = require_user();
-            const result = await add_quiz(user.uid, selected_genres, mood_answers);
+            const result = await add_quiz(user.uid, selected_genres, mood_answers, selected_providers);
 
             if (result.ok) {
                 router.navigate({
@@ -55,9 +99,7 @@ export default function QuizScreen() {
         }
     }
 
-    const continue_disabled = 
-        (step === 1 && selected_genres.length !== 3) || 
-        (step === 2 && Object.keys(mood_answers).length < 3);
+    const continue_disabled = (step === 1 && selected_genres.length < 3) || (step === 2 && Object.keys(mood_answers).length < 3);
 
     return (
         <SafeAreaView style={styles.container}>
@@ -73,13 +115,13 @@ export default function QuizScreen() {
 
             {/* Progress */}
             <View style={styles.progress_container}>
-                {["Genres", "Mood"].map((label, i) => {
+                {["Genres", "Mood", "Providers"].map((label, i) => {
                     const active = step === i + 1;
                     return (
                         <View key={label} style={[styles.step_box, active && styles.active_step]}>
                             <View
                                 style={[
-                                    styles.step_circle, 
+                                    styles.step_circle,
                                     active ? styles.active_circle : styles.inactive_circle
                                 ]}
                             />
@@ -90,8 +132,8 @@ export default function QuizScreen() {
             </View>
 
             {/* Content */}
-            <ScrollView 
-                contentContainerStyle={styles.scroll_content} 
+            <ScrollView
+                contentContainerStyle={styles.scroll_content}
                 showsVerticalScrollIndicator={false}
             >
                 <MotiView
@@ -109,15 +151,18 @@ export default function QuizScreen() {
                                 <MotiText style={styles.title}>
                                     What do you love watching?
                                 </MotiText>
-                                <Text style={styles.subtitle}>Select 3 or more genres</Text>
+                                <Text style={styles.subtitle}>
+                                    Select at least 3 genres
+                                </Text>
                             </View>
 
-                            <GenreSelector
+                            <GridOptionSelector
+                                options={GENRES}
                                 selected={selected_genres}
                                 toggle={toggle_genre}
                             />
                         </>
-                    ) : (
+                    ) : step === 2 ? (
                         <>
                             <View style={styles.title_container}>
                                 <MotiText style={styles.title}>
@@ -133,18 +178,35 @@ export default function QuizScreen() {
                                 set_answers={set_mood_answers}
                             />
                         </>
+                    ) : (
+                        <>
+                            <View style={styles.title_container}>
+                                <MotiText style={styles.title}>
+                                    Where do you watch?
+                                </MotiText>
+                                <Text style={styles.subtitle}>
+                                    Select your streaming providers (optional)
+                                </Text>
+                            </View>
+
+                            <GridOptionSelector
+                                options={STREAMING_PROVIDERS}
+                                selected={selected_providers}
+                                toggle={toggle_provider}
+                            />
+                        </>
                     )}
                 </MotiView>
 
-                <TouchableOpacity 
-                    onPress={handle_continue} 
-                    disabled={continue_disabled} 
+                <TouchableOpacity
+                    onPress={handle_continue}
+                    disabled={continue_disabled}
                     activeOpacity={1}
                 >
                     <LinearGradient
                         colors={(
-                            continue_disabled 
-                                ? theme.colors.gradient.disabled 
+                            continue_disabled
+                                ? theme.colors.gradient.disabled
                                 : theme.colors.gradient.primary
                         ) as [string, string, ...string[]]}
                         start={{ x: 0, y: 0.5 }}
@@ -152,12 +214,28 @@ export default function QuizScreen() {
                         style={styles.continue_button}
                     >
                         <Text style={styles.continue_text}>
-                            {step === 1 
-                                ? `Continue (${selected_genres.length}/3)` 
-                                : "Continue"}
+                            {step === 1
+                                ? `Continue (${selected_genres.length}/3${selected_genres.length > 3 ? '+' : ''})`
+                                : step === 2
+                                    ? "Continue"
+                                    : selected_providers.length > 0
+                                        ? `Continue (${selected_providers.length} selected)`
+                                        : "Continue"}
                         </Text>
                     </LinearGradient>
                 </TouchableOpacity>
+
+                {step === 3 && (
+                    <TouchableOpacity
+                        onPress={handle_skip}
+                        activeOpacity={0.7}
+                        style={styles.skip_button}
+                    >
+                        <Text style={styles.skip_text}>
+                            Skip for now
+                        </Text>
+                    </TouchableOpacity>
+                )}
             </ScrollView>
         </SafeAreaView>
     );
@@ -230,8 +308,8 @@ const styles = StyleSheet.create({
         textAlign: "center",
         marginTop: theme.spacing.xs
     },
-    scroll_content: { 
-        paddingBottom: theme.spacing.giant 
+    scroll_content: {
+        paddingBottom: theme.spacing.giant
     },
     continue_button: {
         borderRadius: theme.border_radius.sm,
@@ -244,5 +322,15 @@ const styles = StyleSheet.create({
         color: theme.colors.text.primary,
         fontWeight: "bold",
         fontSize: 16
+    },
+    skip_button: {
+        marginTop: theme.spacing.lg,
+        paddingVertical: theme.spacing.lg,
+        alignItems: "center",
+    },
+    skip_text: {
+        color: theme.colors.text.muted,
+        fontSize: 14,
+        fontWeight: "500",
     },
 });
