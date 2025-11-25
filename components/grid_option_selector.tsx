@@ -25,9 +25,7 @@ export default function GridOptionSelector({ options, selected, toggle }: Props)
                         style={[styles.option_box, is_selected && styles.option_selected]}
                         activeOpacity={0.8}
                     >
-                        <Text style={
-                            option.color ? [styles.option_emoji, { color: option.color }] : styles.option_emoji
-                        }>{option.emoji}</Text>
+                        <Text style={[styles.option_emoji, option.color && { color: option.color }]}>{option.emoji}</Text>
                         <Text style={styles.option_label}>{option.name}</Text>
                     </TouchableOpacity>
                 );
@@ -60,7 +58,6 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.3,
         shadowRadius: 4,
-        elevation: 3,
     },
     option_emoji: {
         fontSize: 24,
@@ -71,5 +68,6 @@ const styles = StyleSheet.create({
         color: theme.colors.text.primary,
         fontWeight: "500",
         textAlign: "center",
+        marginBottom: theme.spacing.md,
     },
 });
