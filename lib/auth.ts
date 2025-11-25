@@ -51,3 +51,7 @@ export function require_user(): User {
 
     return user;
 }
+
+export function sign_out(): Promise<void> {
+    return auth.signOut();
+}
