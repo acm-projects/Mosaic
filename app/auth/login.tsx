@@ -9,7 +9,7 @@ import { get_user_data } from '@/lib/firestore/users';
 import { base_styles, button_styles, divider_styles, form_styles, theme } from '@/lib/styles';
 import { useRouter } from 'expo-router';
 import { MotiText, MotiView } from 'moti';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { Easing } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -24,6 +24,11 @@ export default function Login() {
     const [password, set_password] = useState("");
 
     const [error_message, set_error_message] = useState("");
+
+    useEffect(() => {
+        router.prefetch("/onboarding/quiz");
+        router.prefetch("/auth/signup");
+    }, []);
 
     async function handle_login(): Promise<void> {
         set_error_message("");
@@ -53,8 +58,9 @@ export default function Login() {
             }
 
             if (!user_data.data.taken_quiz) {
-                router.replace("/onboarding/quiz");
+                router.navigate("/onboarding/quiz");
             } else {
+                router.prefetch("/home");
                 router.replace("/home");
             }
         } catch (err) {
