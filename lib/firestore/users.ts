@@ -64,7 +64,6 @@ export async function add_quiz(uid: string, favorite_genre: string[], mood: Reco
             favorite_genre,
             mood,
             taken_quiz: true,
-            done_movie_swipe: false,
             providers,
         }, { merge: true });
 
