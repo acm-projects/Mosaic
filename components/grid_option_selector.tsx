@@ -1,16 +1,54 @@
+import AmazonPrime from "@/assets/svg/amazon_prime.svg";
+import AppleTV from "@/assets/svg/apple_tv.svg";
+import DisneyPlus from "@/assets/svg/disney+.svg";
+import HBOMax from "@/assets/svg/hbo_max.svg";
+import Hulu from "@/assets/svg/hulu.svg";
+import Netflix from "@/assets/svg/netflix.svg";
+import ParamountPlus from "@/assets/svg/paramount+.svg";
+import Peacock from "@/assets/svg/peacock.svg";
+import Showtime from "@/assets/svg/showtime.svg";
 import { theme } from "@/lib/styles";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface Option {
     name: string;
-    emoji: string;
-    color?: string;
+    emoji?: string;
+    svg?: boolean;
 }
 
 interface Props {
     options: Option[];
     selected: string[];
     toggle: (value: string) => void;
+}
+
+function render_logo(option: Option) {
+    if (option.svg) {
+        switch (option.name) {
+            case "Netflix":
+                return <Netflix width={48} height={48} />;
+            case "Hulu":
+                return <Hulu width={48} height={48} />;
+            case "Disney+":
+                return <DisneyPlus width={64} height={48} />;
+            case "Apple TV+":
+                return <AppleTV width={48} height={48} />;
+            case "Amazon Prime":
+                return <AmazonPrime width={48} height={48} />;
+            case "HBO Max":
+                return <HBOMax width={48} height={48} />;
+            case "Paramount+":
+                return <ParamountPlus width={48} height={48} />;
+            case "Peacock":
+                return <Peacock width={48} height={48} />;
+            case "Showtime":
+                return <Showtime width={48} height={48} />;
+            default:
+                return <Text style={{ fontSize: 24 }}>[UNAVAILABLE]</Text>;
+        }
+    } else {
+        return <Text style={{ fontSize: 24 }}>{option.emoji}</Text>;
+    }
 }
 
 export default function GridOptionSelector({ options, selected, toggle }: Props) {
@@ -25,7 +63,7 @@ export default function GridOptionSelector({ options, selected, toggle }: Props)
                         style={[styles.option_box, is_selected && styles.option_selected]}
                         activeOpacity={0.8}
                     >
-                        <Text style={[styles.option_emoji, option.color && { color: option.color }]}>{option.emoji}</Text>
+                        {render_logo(option)}
                         <Text style={styles.option_label}>{option.name}</Text>
                     </TouchableOpacity>
                 );
