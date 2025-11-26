@@ -17,14 +17,18 @@ export default function Index() {
 
                 if (!user_data.ok) {
                     Alert.alert("Error", user_data.error);
-                } else if (user_data.data.taken_quiz) {
-                    router.navigate("/home");
+                } else if (user_data.data.taken_quiz && user_data.data.favorite_movies.length > 0) {
+                    router.replace("/home");
                 } else {
-                    router.navigate("/onboarding/quiz");
+                    if (!user_data.data.taken_quiz) {
+                        router.replace("/onboarding/quiz");
+                    } else {
+                        router.replace("/onboarding/movie_tinder");
+                    }
                 }
                 
             } else {
-                router.navigate("/auth/login");
+                router.replace("/auth/login");
             }
         });
 
