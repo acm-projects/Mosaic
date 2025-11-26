@@ -5,9 +5,9 @@ export type FirestoreUser = {
     username: string;
     groups: string[];
     favorite_movies: number[];
+    disliked_movies: number[];
     favorite_genre: string[];
-    favorite_actor: string[];
-    favorite_director: string[];
+    providers: string[];
     taken_quiz: boolean;
     createdAt: string;
     mood: Map<string, string>;
