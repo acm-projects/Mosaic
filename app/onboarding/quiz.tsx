@@ -15,30 +15,30 @@ import { Easing } from "react-native-reanimated";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 const GENRES = [
-    { name: "Action", emoji: "💥" },
-    { name: "Comedy", emoji: "😂" },
-    { name: "Drama", emoji: "🎭" },
-    { name: "Horror", emoji: "👻" },
-    { name: "Sci-Fi", emoji: "🚀" },
-    { name: "Romance", emoji: "❤️" },
-    { name: "Thriller", emoji: "😱" },
-    { name: "Animation", emoji: "🎨" },
-    { name: "Documentary", emoji: "📹" },
-    { name: "Fantasy", emoji: "🧙" },
-    { name: "Mystery", emoji: "🔍" },
-    { name: "Adventure", emoji: "🗺️" },
+    { name: "Action", emoji: "💥", svg: false },
+    { name: "Comedy", emoji: "😂", svg: false },
+    { name: "Drama", emoji: "🎭", svg: false },
+    { name: "Horror", emoji: "👻", svg: false },
+    { name: "Sci-Fi", emoji: "🚀", svg: false },
+    { name: "Romance", emoji: "❤️", svg: false },
+    { name: "Thriller", emoji: "😱", svg: false },
+    { name: "Animation", emoji: "🎨", svg: false },
+    { name: "Documentary", emoji: "📹", svg: false },
+    { name: "Fantasy", emoji: "🧙", svg: false },
+    { name: "Mystery", emoji: "🔍", svg: false },
+    { name: "Adventure", emoji: "🗺️", svg: false },
 ]
 
 const STREAMING_PROVIDERS = [
-    { name: "Netflix", emoji: "N", color: "#E50914" },
-    { name: "Disney+", emoji: "D+", color: "#113CCF" },
-    { name: "HBO Max", emoji: "HBO", color: "#6C5CE7" },
-    { name: "Amazon Prime", emoji: "P", color: "#00A8E1" },
-    { name: "Hulu", emoji: "H", color: "#1CE783" },
-    { name: "Apple TV+", emoji: "TV+", color: "#000000" },
-    { name: "Paramount+", emoji: "P+", color: "#0064FF" },
-    { name: "Peacock", emoji: "P", color: "#6C2C91" },
-    { name: "Showtime", emoji: "SHO", color: "#FF0000" },
+    { name: "Netflix", svg: true },
+    { name: "Disney+", svg: true },
+    { name: "HBO Max", svg: true },
+    { name: "Amazon Prime", svg: true },
+    { name: "Hulu", svg: true },
+    { name: "Apple TV+", svg: true },
+    { name: "Paramount+", svg: true },
+    { name: "Peacock", svg: true },
+    { name: "Showtime", svg: true },
 ]
 
 export default function QuizScreen() {
