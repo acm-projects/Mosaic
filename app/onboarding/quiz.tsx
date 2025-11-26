@@ -126,7 +126,9 @@ export default function QuizScreen() {
                     size={24}
                     color={"white"}
                     onPress={async () => {
+                        set_loading(true);
                         await sign_out();
+                        set_loading(false);
                         router.replace("/auth/login");
                     }}
                 />

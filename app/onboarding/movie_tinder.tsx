@@ -1,12 +1,13 @@
 import LoadingPopup from '@/components/loading_popup';
 import MovieCard from '@/components/movie_swipe_card';
 import PageBackground from '@/components/page_background';
-import { require_user } from '@/lib/auth';
-import { update_favorite_movies } from '@/lib/firestore/users';
+import { require_user, sign_out } from '@/lib/auth';
+import { get_user_data, update_favorite_movies } from '@/lib/firestore/users';
 import { fetch_movies_for_genres } from '@/lib/movies_api';
+import { theme } from '@/lib/styles';
 import { MovieDetails } from '@/lib/types';
-import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Heart, RotateCcw, X } from 'lucide-react-native';
+import { router, useLocalSearchParams, useNavigation } from 'expo-router';
+import { Heart, LogOut, RotateCcw, X } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
 import { Dimensions, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
@@ -20,20 +21,43 @@ export default function FavoriteMovies() {
     const [loading, set_loading] = useState(false);
     const { favorite_genres } = useLocalSearchParams();
 
+    const navigation = useNavigation();
+
     useEffect(() => {
         async function fetch() {
             set_loading(true);
+            let genres: string[] = [];
 
-            const genres = JSON.parse(favorite_genres as string);
+            try {
+                genres = JSON.parse(favorite_genres as string);
+            } catch (e) {
+                const user = require_user();
+                const result = await get_user_data(user.uid);
+
+                if (!result.ok) {
+                    console.log("Failed to fetch user data:", result.error);
+                    set_loading(false);
+                    return;
+                }
+
+                genres = result.data.favorite_genre ?? [];
+            }
+
             const movies = await fetch_movies_for_genres(genres);
-
-            console.log(movies);
+            movies.forEach(movie => { console.log(movie.title, movie.popularity) });
 
             set_movies(movies);
             set_loading(false);
         }
 
+        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
+            if (e.data.action.type === 'GO_BACK') {
+                e.preventDefault();
+            }
+        });
+
         fetch();
+        return unsubscribe;
     }, []);
 
     function handle_swipe(dir: 'left' | 'right' | 'skip') {
@@ -87,9 +111,18 @@ export default function FavoriteMovies() {
             <LoadingPopup visible={loading} />
 
             {/* Back Button */}
-            <TouchableOpacity style={styles.backButton}>
-                <ArrowLeft color="white" size={20} onPress={() => router.back()} />
-            </TouchableOpacity>
+            <View style={styles.back_button}>
+                <LogOut
+                    size={24}
+                    color={"white"}
+                    onPress={async () => {
+                        set_loading(true);
+                        await sign_out();
+                        set_loading(false);
+                        router.replace("/auth/login");
+                    }}
+                />
+            </View>
 
             {/* Progress Section */}
             <View style={styles.progressContainer}>
@@ -142,19 +175,17 @@ const styles = StyleSheet.create({
         paddingTop: 48,
         paddingBottom: 48,
     },
-    backButton: {
-        position: 'absolute',
-        top: 64,
-        left: 24,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.2)',
-        justifyContent: 'center',
-        alignItems: 'center',
-        zIndex: 10,
+    back_button: {
+        position: "absolute",
+        top: theme.spacing.massive,
+        right: theme.spacing.xxl,
+        zIndex: 20,
+        backgroundColor: theme.colors.background.primary,
+        borderRadius: theme.border_radius.full,
+        padding: theme.spacing.md,
+        justifyContent: "center",
+        alignItems: "center",
+        flex: 1
     },
     progressContainer: {
         paddingTop: 80,
