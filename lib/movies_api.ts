@@ -80,8 +80,11 @@ export async function fetch_movies_for_genres(genres: string[]): Promise<MovieDe
         return [];
     };
 
-    const unique = new Map();
+    const unique: Map<number, MovieDetails> = new Map();
     [...and_res.data, ...or_res.data].forEach(m => unique.set(m.id, m));
 
-    return Array.from(unique.values());
+    const unique_moives = Array.from(unique.values());
+    unique_moives.sort((a, b) => b.vote_count - a.vote_count);
+
+    return unique_moives;
 }
