@@ -18,7 +18,7 @@ export default function Index() {
                 if (!user_data.ok) {
                     Alert.alert("Error", user_data.error);
                 } else if (user_data.data.taken_quiz && user_data.data.favorite_movies.length > 0) {
-                    router.replace("/home");
+                    router.replace("/home/(tabs)");
                 } else {
                     if (!user_data.data.taken_quiz) {
                         router.replace("/onboarding/quiz");
