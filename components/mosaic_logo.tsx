@@ -1,15 +1,20 @@
-import { Film } from "lucide-react-native";
+import { Clapperboard } from "lucide-react-native";
 import { MotiView } from "moti";
 import React from "react";
 import { Text, View } from "react-native";
 import { Easing } from 'react-native-reanimated';
 
+interface MosaicLogoProps {
+    size?: "sm" | "md" | "lg";
+    direction?: "row" | "column";
+    show_subtitle?: boolean;
+}
 
-export default function MosaicLogo({ size = "md" }: { size?: "sm" | "md" | "lg"; }) {
+export default function MosaicLogo({ size = "md", direction = "row", show_subtitle = true }: MosaicLogoProps) {
     const size_map = {
         sm: { text: 18, icon: 16 },
         md: { text: 30, icon: 24 },
-        lg: { text: 48, icon: 32 },
+        lg: { text: 48, icon: 64 },
     };
 
     const { text, icon } = size_map[size];
@@ -25,7 +30,7 @@ export default function MosaicLogo({ size = "md" }: { size?: "sm" | "md" | "lg";
             }}
         >
             <View style={{ marginBottom: 8 }}>
-                <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+                <View style={{ flexDirection: direction, alignItems: "center", gap: 8 }}>
                     <MotiView
                         from={{ scale: 0, rotate: "-90deg" }}
                         animate={{ scale: 1, rotate: "0deg" }}
@@ -35,7 +40,7 @@ export default function MosaicLogo({ size = "md" }: { size?: "sm" | "md" | "lg";
                             easing: Easing.bezier(0.23, 1, 0.32, 1)
                         }}
                     >
-                        <Film size={icon} color="#818cf8" />
+                        <Clapperboard size={icon} color="#818cf8" />
                     </MotiView>
 
                     <MotiView
@@ -60,8 +65,13 @@ export default function MosaicLogo({ size = "md" }: { size?: "sm" | "md" | "lg";
                     </MotiView>
                 </View>
             </View>
+            
 
-            <Text style={{ color: "rgb(148, 163, 184)", fontSize: 20, fontWeight: "light" }}>Discover what to watch together</Text>
+            {show_subtitle && (
+                <Text style={{ color: "rgb(148, 163, 184)", fontSize: 20, fontWeight: "light" }}>
+                    Discover what to watch together
+                </Text>
+            )}
         </MotiView>
     );
 }
