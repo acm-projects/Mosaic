@@ -1,187 +1,106 @@
-import { Heart, RotateCcw, X } from "lucide-react-native";
-import React, { useRef, useState } from "react";
-import {
-    Animated,
-    Dimensions,
-    Image,
-    PanResponder,
-    StyleSheet,
-    Text,
-    View,
-} from "react-native";
+import { MovieDetails } from "@/lib/types";
+import { Bookmark } from "lucide-react-native";
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
-const { width } = Dimensions.get("window");
-const SWIPE_THRESHOLD = 120;
-
-export default function MovieCard({ onSwipe }: { onSwipe?: (dir: "left" | "right" | "skip") => void }) {
-    const position = useRef(new Animated.ValueXY()).current;
-    const [swipeDirection, setSwipeDirection] = useState<"left" | "right" | "skip" | null>(null);
-
-    const panResponder = useRef(
-        PanResponder.create({
-            onStartShouldSetPanResponder: () => true,
-            onPanResponderMove: (_, gesture) => {
-                position.setValue({ x: gesture.dx, y: gesture.dy });
-
-                if (gesture.dx > 30) setSwipeDirection("right");
-                else if (gesture.dx < -30) setSwipeDirection("left");
-                else if (gesture.dy < -30) setSwipeDirection("skip");
-                else setSwipeDirection(null);
-            },
-            onPanResponderRelease: (_, gesture) => {
-                let direction: "left" | "right" | "skip" | null = null;
-
-                if (gesture.dx > SWIPE_THRESHOLD) direction = "right";
-                else if (gesture.dx < -SWIPE_THRESHOLD) direction = "left";
-                else if (gesture.dy < -SWIPE_THRESHOLD / 2) direction = "skip";
-
-                if (direction) {
-                    Animated.timing(position, {
-                        toValue:
-                            direction === "right"
-                                ? { x: width + 200, y: gesture.dy }
-                                : direction === "left"
-                                ? { x: -width - 200, y: gesture.dy }
-                                : { x: 0, y: -600 },
-                        duration: 300,
-                        useNativeDriver: true,
-                    }).start(() => {
-                        position.setValue({ x: 0, y: 0 });
-                        setSwipeDirection(null);
-                        onSwipe?.(direction);
-                    });
-                } else {
-                    Animated.spring(position, {
-                        toValue: { x: 0, y: 0 },
-                        useNativeDriver: true,
-                    }).start(() => setSwipeDirection(null));
-                }
-            },
-        })
-    ).current;
-
-    const rotate = position.x.interpolate({
-        inputRange: [-width / 2, 0, width / 2],
-        outputRange: ["-15deg", "0deg", "15deg"],
-        extrapolate: "clamp",
-    });
-
-    const cardStyle = {
-        transform: [...position.getTranslateTransform(), { rotate }],
-    };
-
+export default function MovieCard({movie_details}: {movie_details: MovieDetails}) {
     return (
-        <View style={styles.cardContainer}>
-            <Animated.View
-                {...panResponder.panHandlers}
-                style={[styles.card, cardStyle]}
-            >
+        <TouchableOpacity style={styles.movieCard}>
+            <View style={styles.posterContainer}>
                 <Image
-                    source={{ uri: "https://image.tmdb.org/t/p/original/8ZTVqvKDQ8emSGUEMjsS4yHAwrp.jpg" }}
-                    style={styles.cardImage}
+                    source={{ uri: `https://image.tmdb.org/t/p/w200${movie_details.poster_path}` }}
+                    style={styles.posterImage}
+                    resizeMode="cover"
                 />
-                <View style={styles.gradientOverlay} />
-
-                <View style={styles.cardInfo}>
-                    <Text style={styles.movieTitle}>Inception</Text>
-                    <Text style={styles.movieMeta}>2010 • Sci-Fi, Thriller</Text>
-                    <View style={styles.movieDetails}>
-                        <Text style={styles.rating}>★ 8.8</Text>
-                        <Text style={styles.dot}>•</Text>
-                        <Text style={styles.runtime}>148 min</Text>
-                    </View>
-                </View>
-
-                {/* Swipe Indicators */}
-                {swipeDirection === "left" && (
-                    <View style={styles.indicatorContainer}>
-                        <View style={[styles.indicator, styles.indicatorLeft]}>
-                            <X size={64} color="#ef4444" />
-                        </View>
-                    </View>
-                )}
-                {swipeDirection === "right" && (
-                    <View style={styles.indicatorContainer}>
-                        <View style={[styles.indicator, styles.indicatorRight]}>
-                            <Heart size={64} color="#22c55e" fill="#22c55e" />
-                        </View>
-                    </View>
-                )}
-                {swipeDirection === "skip" && (
-                    <View style={styles.indicatorContainer}>
-                        <View style={[styles.indicator, styles.indicatorSkip]}>
-                            <RotateCcw size={64} color="#9ca3af" />
-                        </View>
-                    </View>
-                )}
-            </Animated.View>
-        </View>
+                <TouchableOpacity
+                    style={styles.saveButton}
+                    onPress={() => console.log("You should save this.")}
+                >
+                    <Bookmark
+                        size={24}
+                        color={"white"}
+                    />
+                </TouchableOpacity>
+            </View>
+            <Text style={styles.movieTitle} numberOfLines={1}>
+                {movie_details.title}
+            </Text>
+            <Text style={styles.movieYear}>{movie_details.release_date.slice(0, 4)}</Text>
+            <View style={styles.genreContainer}>
+                {movie_details.genres.slice(0, 2).map((genre, index) => (
+                    <Text style={styles.genreText} key={genre.id}>
+                        {genre.name}
+                    </Text>
+                ))}
+            </View>
+        </TouchableOpacity>
     );
 }
 
 const styles = StyleSheet.create({
-    cardContainer: {
-        justifyContent: "center",
-        alignItems: "center",
+    movieCard: {
+        width: 140,
+        marginLeft: 16,
+    },
+    posterContainer: {
+        width: '100%',
+        height: 200,
+        borderRadius: 8,
+        overflow: 'hidden',
+        backgroundColor: '#ffffff10',
+    },
+    posterImage: {
+        width: '100%',
+        height: '100%',
+    },
+    posterPlaceholder: {
         flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
     },
-    card: {
-        width: "75%",
-        aspectRatio: 2 / 3,
-        borderRadius: 20,
-        overflow: "hidden",
-        shadowColor: "#000",
-        shadowOpacity: 0.4,
-        shadowOffset: { width: 0, height: 6 },
-        shadowRadius: 12,
-        elevation: 10,
-        position: "relative",
+    matchBadge: {
+        position: 'absolute',
+        top: 8,
+        left: 8,
+        backgroundColor: '#00000080',
+        borderRadius: 4,
+        padding: 4,
     },
-    cardImage: {
-        width: "100%",
-        height: "100%",
-        resizeMode: "cover",
+    matchText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: 'bold',
     },
-    gradientOverlay: {
-        ...StyleSheet.absoluteFillObject,
-        backgroundColor: "rgba(0,0,0,0.5)",
+    saveButton: {
+        position: 'absolute',
+        top: 8,
+        right: 8,
+        padding: 4,
+        backgroundColor: '#00000080',
+        borderRadius: 999999,
     },
-    cardInfo: {
-        position: "absolute",
-        bottom: 0,
-        left: 0,
-        right: 0,
-        padding: 24,
+    movieTitle: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '500',
+        marginTop: 8,
     },
-    movieTitle: { color: "#fff", fontSize: 22, fontWeight: "600" },
-    movieMeta: { color: "#d1d5db", fontSize: 14, marginTop: 4 },
-    movieDetails: { flexDirection: "row", alignItems: "center", marginTop: 4 },
-    rating: { color: "#facc15", fontSize: 14 },
-    dot: { color: "#9ca3af", marginHorizontal: 6 },
-    runtime: { color: "#9ca3af", fontSize: 14 },
-    indicatorContainer: {
-        ...StyleSheet.absoluteFillObject,
-        justifyContent: "center",
-        alignItems: "center",
+    movieYear: {
+        color: '#ffffff80',
+        fontSize: 14,
+        marginTop: 4,
     },
-    indicator: {
-        width: 128,
-        height: 128,
-        borderRadius: 64,
-        borderWidth: 4,
-        justifyContent: "center",
-        alignItems: "center",
+    genreContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        marginTop: 4,
+        gap: 4,
     },
-    indicatorLeft: {
-        borderColor: "#ef4444",
-        backgroundColor: "rgba(239,68,68,0.2)",
-    },
-    indicatorRight: {
-        borderColor: "#22c55e",
-        backgroundColor: "rgba(34,197,94,0.2)",
-    },
-    indicatorSkip: {
-        borderColor: "#9ca3af",
-        backgroundColor: "rgba(107,114,128,0.2)",
+    genreText: {
+        color: '#ffffff80',
+        fontSize: 12,
+        backgroundColor: '#ffffff20',
+        paddingHorizontal: 8,
+        paddingVertical: 2,
+        borderRadius: 4,
     },
 });
