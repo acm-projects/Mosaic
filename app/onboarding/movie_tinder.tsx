@@ -44,7 +44,6 @@ export default function FavoriteMovies() {
             }
 
             const movies = await fetch_movies_for_genres(genres);
-            movies.forEach(movie => { console.log(movie.title, movie.popularity) });
 
             set_movies(movies);
             set_loading(false);
@@ -87,6 +86,8 @@ export default function FavoriteMovies() {
             console.log('Failed to update favorite movies: ', result.error);
             return;
         }
+
+        router.replace('/home/(tabs)');
     }
 
     function render_movie_card() {

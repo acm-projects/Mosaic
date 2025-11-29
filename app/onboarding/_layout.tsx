@@ -5,7 +5,6 @@ export default function RootLayout() {
         <Stack>
             <Stack.Screen name="quiz" options={{ headerShown: false }} />
             <Stack.Screen name="movie_tinder" options={{ headerShown: false }} />
-            <Stack.Screen name="groups" options={{ headerShown: false }} />
         </Stack>
     );
 }
