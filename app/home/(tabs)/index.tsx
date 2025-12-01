@@ -20,11 +20,6 @@ import { Toast } from 'toastify-react-native';
 
 const codes_to_fetch = [27205, 27206, 27207, 27208, 27209, 27210]
 
-interface MovieRowProps {
-    title: string;
-    movies: MovieDetails[];
-}
-
 function Header({ insets }: { insets: ReturnType<typeof useSafeAreaInsets> }) {
     return (
         <View style={[styles.header, { paddingTop: insets.top + 32 }]}>
