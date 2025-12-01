@@ -2,7 +2,6 @@ import AuthButton from "@/components/auth_button";
 import AuthInput from "@/components/auth_input";
 import LoadingPopup from "@/components/loading_popup";
 import MosaicLogo from "@/components/mosaic_logo";
-import PageBackground from "@/components/page_background";
 import { sign_up } from "@/lib/auth";
 import { base_styles, form_styles, theme } from "@/lib/styles";
 import { router } from "expo-router";
@@ -72,7 +71,7 @@ export default function SignUp() {
     return (
         <SafeAreaView style={base_styles.container}>
             <LoadingPopup visible={loading} />
-            <PageBackground />
+            {/*<PageBackground />*/}
 
             <KeyboardAvoidingView
                 style={{ flex: 1 }}

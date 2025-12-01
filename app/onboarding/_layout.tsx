@@ -2,7 +2,9 @@ import { Stack } from "expo-router";
 
 export default function RootLayout() {
     return (
-        <Stack>
+        <Stack screenOptions={{ 
+            contentStyle: { backgroundColor: 'transparent' }
+        }}>
             <Stack.Screen name="quiz" options={{ headerShown: false }} />
             <Stack.Screen name="movie_tinder" options={{ headerShown: false }} />
         </Stack>

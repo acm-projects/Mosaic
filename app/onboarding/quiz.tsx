@@ -1,7 +1,6 @@
 import GridOptionSelector from "@/components/grid_option_selector";
 import LoadingPopup from "@/components/loading_popup";
 import MoodSelector from "@/components/mood_selector";
-import PageBackground from "@/components/page_background";
 import { require_user, sign_out } from "@/lib/auth";
 import { add_quiz } from "@/lib/firestore/users";
 import { theme } from "@/lib/styles";
@@ -118,7 +117,7 @@ export default function QuizScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <PageBackground />
+            {/*<PageBackground />*/}
             <LoadingPopup visible={loading} />
 
             <View style={styles.back_button}>

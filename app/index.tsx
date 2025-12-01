@@ -1,5 +1,4 @@
 import MosaicLogo from "@/components/mosaic_logo";
-import PageBackground from "@/components/page_background";
 import { require_user } from "@/lib/auth";
 import { auth } from "@/lib/firebase_config";
 import { get_user_data } from "@/lib/firestore/users";
@@ -37,8 +36,6 @@ export default function Index() {
 
     return (
         <SafeAreaView style={StyleSheet.absoluteFill}>
-            <PageBackground />
-
             <MosaicLogo size="lg" direction="column" show_subtitle={false} />
         </SafeAreaView>
     );

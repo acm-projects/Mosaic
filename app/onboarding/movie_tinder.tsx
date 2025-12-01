@@ -1,6 +1,5 @@
 import LoadingPopup from '@/components/loading_popup';
 import MovieCard from '@/components/movie_swipe_card';
-import PageBackground from '@/components/page_background';
 import { require_user, sign_out } from '@/lib/auth';
 import { get_user_data, update_favorite_movies } from '@/lib/firestore/users';
 import { fetch_movies_for_genres } from '@/lib/movies_api';
@@ -108,7 +107,7 @@ export default function FavoriteMovies() {
 
     return (
         <View style={styles.container}>
-            <PageBackground />
+            {/*<PageBackground />*/}
             <LoadingPopup visible={loading} />
 
             {/* Back Button */}

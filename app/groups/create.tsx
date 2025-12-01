@@ -1,5 +1,4 @@
 // src/screens/GroupSetup/CreateGroupScreen.tsx
-import PageBackground from '@/components/page_background';
 import { create_group } from '@/lib/firestore/groups';
 import { router } from 'expo-router';
 import { ArrowLeft, Users } from 'lucide-react-native';
@@ -23,14 +22,14 @@ export default function CreateGroupScreen() {
             alert("Error creating group: " + result.error);
             return;
         } else {
-            router.replace(`/onboarding/groups/invite?code=${result.data}`);
+            router.replace(`/groups/invite?code=${result.data}`);
         }
     }
       
 
     return (
         <View style={styles.container}>
-            <PageBackground />
+            {/*<PageBackground />*/}
             {/* Back Button */}
             <TouchableOpacity
                 onPress={() => router.back()}

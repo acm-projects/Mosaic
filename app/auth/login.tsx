@@ -3,7 +3,6 @@ import AuthButton from "@/components/auth_button";
 import AuthInput from '@/components/auth_input';
 import LoadingPopup from '@/components/loading_popup';
 import MosaicLogo from '@/components/mosaic_logo';
-import PageBackground from '@/components/page_background';
 import { login } from '@/lib/auth';
 import { get_user_data } from '@/lib/firestore/users';
 import { base_styles, button_styles, divider_styles, form_styles, theme } from '@/lib/styles';
@@ -74,7 +73,7 @@ export default function Login() {
         <SafeAreaView style={base_styles.container}>
             <LoadingPopup visible={loading} />
 
-            <PageBackground />
+            {/*<PageBackground />*/}
 
             <View style={[base_styles.center_container, styles.container]}>
                 <MosaicLogo size="lg" />

@@ -1,6 +1,5 @@
 import MosaicLogo from '@/components/mosaic_logo';
 import MovieCard from '@/components/movie_card';
-import PageBackground from '@/components/page_background';
 import { get_movie_by_code } from '@/lib/movies_api';
 import { MovieDetails } from '@/lib/types';
 import { router } from 'expo-router';
@@ -47,7 +46,7 @@ function GroupSection() {
             <View style={styles.sectionHeader}>
                 <Text style={styles.sectionTitle}>Your Groups</Text>
                 <TouchableOpacity style={styles.createGroupButton} onPress={() => {
-                    router.navigate('/groups/');
+                    router.navigate('/groups');
                 }}>
                     <Plus size={16} color="white" />
                 </TouchableOpacity>
@@ -137,7 +136,6 @@ export default function Home() {
 
     return (
         <View style={styles.container}>
-            <PageBackground />
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <Header insets={insets} />
                 <GroupSection />
@@ -150,7 +148,6 @@ export default function Home() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000000',
     },
     scrollContent: {
         paddingBottom: 24,

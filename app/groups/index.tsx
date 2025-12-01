@@ -1,4 +1,3 @@
-import PageBackground from '@/components/page_background';
 import { router } from 'expo-router';
 import { Plus, Users } from 'lucide-react-native';
 import React from 'react';
@@ -7,8 +6,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default function ChooseGroupAction() {
     return (
         <View style={styles.container}>
-            <PageBackground />
-            
             <View style={styles.iconContainer}>
                 <View style={styles.iconCircle}>
                     <Users size={48} color="white" />
@@ -22,7 +19,7 @@ export default function ChooseGroupAction() {
 
             <TouchableOpacity
                 style={[styles.button, styles.createButton]}
-                onPress={() => router.navigate('/onboarding/groups/create')}
+                onPress={() => router.navigate('/groups/create')}
                 activeOpacity={0.8}
             >
                 <Plus size={20} color="white" style={styles.iconSpacing} />
@@ -31,7 +28,7 @@ export default function ChooseGroupAction() {
 
             <TouchableOpacity
                 style={[styles.button, styles.joinButton]}
-                onPress={() => router.navigate('/onboarding/groups/join')}
+                onPress={() => router.navigate('/groups/join')}
                 activeOpacity={0.8}
             >
                 <Text style={styles.joinButtonText}>Join Existing Group</Text>
@@ -50,7 +47,6 @@ export default function ChooseGroupAction() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
         paddingHorizontal: 24,
         justifyContent: 'center',
     },

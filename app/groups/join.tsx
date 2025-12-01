@@ -1,5 +1,4 @@
 import LoadingPopup from '@/components/loading_popup';
-import PageBackground from '@/components/page_background';
 import { join_group } from '@/lib/firestore/groups';
 import { router } from 'expo-router';
 import { ArrowLeft } from 'lucide-react-native';
@@ -32,7 +31,7 @@ export default function JoinGroupScreen() {
 
     return (
         <View style={styles.container}>
-            <PageBackground />
+            {/*<PageBackground />*/}
             <LoadingPopup visible={loading} />
             {/* Back Button */}
             <TouchableOpacity

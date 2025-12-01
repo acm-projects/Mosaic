@@ -1,4 +1,3 @@
-import PageBackground from '@/components/page_background';
 import SearchMovieCard from '@/components/search_movie_card';
 import { get_movie_by_code } from '@/lib/movies_api';
 import { MovieDetails } from '@/lib/types';
@@ -72,7 +71,6 @@ export default function DiscoverScreen() {
 
     return (
         <View style={styles.container}>
-            <PageBackground />
             {/* Header */}
             <View style={styles.header}>
                 <Text style={styles.title}>Discover</Text>
@@ -135,7 +133,6 @@ export default function DiscoverScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000010',
         paddingBottom: 24,
     },
     header: {
