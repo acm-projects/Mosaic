@@ -11,6 +11,7 @@ export default function RootLayout() {
             <Stack.Screen name="join" />
             <Stack.Screen name="create" />
             <Stack.Screen name="invite" />
+            <Stack.Screen name="[group_id]" />
         </Stack>
     );
 }
