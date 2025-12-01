@@ -16,6 +16,7 @@ export default function RootLayout() {
                 <Stack.Screen name="onboarding" />
                 <Stack.Screen name="home/(tabs)" />
                 <Stack.Screen name="groups" />
+                <Stack.Screen name="movie" />
             </Stack>
         </View>
     );
