@@ -1,7 +1,7 @@
+import BackButton from '@/components/back_button';
 import LoadingPopup from '@/components/loading_popup';
 import { join_group } from '@/lib/firestore/groups';
 import { router } from 'expo-router';
-import { ArrowLeft } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { ActivityIndicator, Alert, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -31,16 +31,8 @@ export default function JoinGroupScreen() {
 
     return (
         <View style={styles.container}>
-            {/*<PageBackground />*/}
             <LoadingPopup visible={loading} />
-            {/* Back Button */}
-            <TouchableOpacity
-                onPress={() => router.back()}
-                style={styles.backButton}
-                activeOpacity={0.7}
-            >
-                <ArrowLeft size={20} color="white" />
-            </TouchableOpacity>
+            <BackButton />
 
             {/* Title and subtitle */}
             <Text style={styles.title}>Join a Group</Text>
@@ -78,20 +70,8 @@ export default function JoinGroupScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
         paddingHorizontal: 24,
-        paddingTop: 64,
-    },
-    backButton: {
-        position: 'absolute',
-        top: 64,
-        left: 24,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        backgroundColor: 'rgba(255,255,255,0.15)',
-        alignItems: 'center',
-        justifyContent: 'center',
+        paddingTop: 128,
     },
     title: {
         fontSize: 24,

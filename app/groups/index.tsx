@@ -1,3 +1,4 @@
+import BackButton from '@/components/back_button';
 import { router } from 'expo-router';
 import { Plus, Users } from 'lucide-react-native';
 import React from 'react';
@@ -6,6 +7,8 @@ import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 export default function ChooseGroupAction() {
     return (
         <View style={styles.container}>
+            <BackButton />
+
             <View style={styles.iconContainer}>
                 <View style={styles.iconCircle}>
                     <Users size={48} color="white" />
@@ -32,13 +35,6 @@ export default function ChooseGroupAction() {
                 activeOpacity={0.8}
             >
                 <Text style={styles.joinButtonText}>Join Existing Group</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                onPress={() => router.navigate('/home')}
-                style={styles.skipContainer}
-            >
-                <Text style={styles.skipText}>Skip for now</Text>
             </TouchableOpacity>
         </View>
     );

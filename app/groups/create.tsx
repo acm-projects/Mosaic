@@ -1,7 +1,8 @@
 // src/screens/GroupSetup/CreateGroupScreen.tsx
+import BackButton from '@/components/back_button';
 import { create_group } from '@/lib/firestore/groups';
 import { router } from 'expo-router';
-import { ArrowLeft, Users } from 'lucide-react-native';
+import { Users } from 'lucide-react-native';
 import React, { useState } from 'react';
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 
@@ -29,15 +30,7 @@ export default function CreateGroupScreen() {
 
     return (
         <View style={styles.container}>
-            {/*<PageBackground />*/}
-            {/* Back Button */}
-            <TouchableOpacity
-                onPress={() => router.back()}
-                style={styles.backButton}
-                activeOpacity={0.7}
-            >
-                <ArrowLeft size={20} color="white" />
-            </TouchableOpacity>
+            <BackButton />
 
             {/* Title */}
             <Text style={styles.title}>Create Your Group</Text>
@@ -90,7 +83,6 @@ export default function CreateGroupScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
         paddingHorizontal: 24,
         paddingTop: 64,
     },

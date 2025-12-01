@@ -1,6 +1,7 @@
+import BackButton from '@/components/back_button';
 import * as Clipboard from 'expo-clipboard';
 import { router, useLocalSearchParams } from 'expo-router';
-import { ArrowLeft, Copy, Users } from 'lucide-react-native';
+import { Copy, Users } from 'lucide-react-native';
 import React from 'react';
 import { StyleSheet, Text, ToastAndroid, TouchableOpacity, View } from 'react-native';
 
@@ -20,14 +21,7 @@ export default function InviteGroupScreen() {
 
     return (
         <View style={styles.container}>
-            {/* Back button */}
-            <TouchableOpacity
-                onPress={() => router.navigate('/home')}
-                style={styles.backButton}
-                activeOpacity={0.7}
-            >
-                <ArrowLeft size={20} color="white" />
-            </TouchableOpacity>
+            <BackButton />
 
             {/* Header */}
             <View style={styles.header}>
@@ -66,7 +60,6 @@ export default function InviteGroupScreen() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
         paddingHorizontal: 24,
         paddingTop: 64,
         justifyContent: 'center',
