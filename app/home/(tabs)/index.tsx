@@ -34,8 +34,8 @@ interface MovieRowProps {
 
 function Header({ insets }: { insets: ReturnType<typeof useSafeAreaInsets> }) {
     return (
-        <View style={[styles.header, { paddingTop: insets.top + 16 }]}>
-            <MosaicLogo size="md" />
+        <View style={[styles.header, { paddingTop: insets.top + 32 }]}>
+            <MosaicLogo size="lg" />
         </View>
     );
 }
