@@ -35,8 +35,8 @@ export default function Index() {
     }, []);
 
     return (
-        <SafeAreaView style={StyleSheet.absoluteFill}>
-            <MosaicLogo size="lg" direction="column" show_subtitle={false} />
+        <SafeAreaView style={[StyleSheet.absoluteFill, { justifyContent: "center", alignItems: "center" }]}>
+            <MosaicLogo size="xll" direction="column" show_subtitle={false} />
         </SafeAreaView>
     );
 };
