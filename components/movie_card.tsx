@@ -1,10 +1,11 @@
 import { MovieDetails } from "@/lib/types";
+import { router } from "expo-router";
 import { Bookmark } from "lucide-react-native";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 export default function MovieCard({movie_details}: {movie_details: MovieDetails}) {
     return (
-        <TouchableOpacity style={styles.movieCard}>
+        <TouchableOpacity style={styles.movieCard} onPress={() => router.navigate(`/movie/${movie_details.id}`)}>
             <View style={styles.posterContainer}>
                 <Image
                     source={{ uri: `https://image.tmdb.org/t/p/w200${movie_details.poster_path}` }}

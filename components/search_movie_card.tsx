@@ -1,189 +1,169 @@
 import { MovieDetails } from "@/lib/types";
-import { Bookmark, Heart } from "lucide-react-native";
+import { router } from "expo-router";
+import { Bookmark } from "lucide-react-native";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
+const TMDB_IMAGE_BASE = 'https://image.tmdb.org/t/p/';
+
 export default function SearchMovieCard({ movie }: { movie: MovieDetails }) {
+    const poster_url = movie.poster_path
+        ? `${TMDB_IMAGE_BASE}w500${movie.poster_path}`
+        : null;
+
     return (
-        <View style={styles.movieCard}>
+        <TouchableOpacity
+            style={styles.movieCard}
+            onPress={() => router.navigate(`/movie/${movie.id}`)}
+            activeOpacity={0.9}
+        >
             {/* Movie Image */}
-            <TouchableOpacity activeOpacity={0.8}>
-                <Image
-                    source={{ uri: "https://image.tmdb.org/t/p/w500/28kKbSUvUz6P5RE1AuMJMO7IMfK.jpg" }}
-                    style={styles.movieImage}
-                    resizeMode="cover"
-                />
+            <View style={styles.imageContainer}>
+                {poster_url ? (
+                    <Image
+                        source={{ uri: poster_url }}
+                        style={styles.movieImage}
+                        resizeMode="cover"
+                    />
+                ) : (
+                    <View style={[styles.movieImage, styles.placeholderImage]} />
+                )}
+
                 <View style={styles.imageOverlay} />
 
-                {/* Match Badge */}
-                <View style={styles.matchBadge}>
-                    <Text style={styles.matchText}>
-                        80% Match
-                    </Text>
-                </View>
-
-                {/* Like Button */}
-                <TouchableOpacity style={[styles.iconButton, { right: 52 }]}>
-                    <Heart
-                        size={20}
-                        color={'#fff'}
-                        fill={'none'}
-                    />
-                </TouchableOpacity>
-
                 {/* Save Button */}
-                <TouchableOpacity style={[styles.iconButton, { right: 10 }]}>
+                <TouchableOpacity
+                    style={styles.iconButton}
+                    onPress={(e) => {
+                        e.stopPropagation();
+                        // Add bookmark logic here
+                    }}
+                >
                     <Bookmark
                         size={20}
                         color="#fff"
                         fill={'none'}
                     />
                 </TouchableOpacity>
-            </TouchableOpacity>
+            </View>
 
             {/* Info */}
             <View style={styles.infoContainer}>
-                <Text style={styles.movieTitle}>{movie.title}</Text>
-                <View style={styles.movieMeta}>
-                    <Text style={styles.metaText}>{movie.release_date.slice(0, 4)}</Text>
-                    <Text style={styles.metaDot}>•</Text>
-                    <Text style={styles.metaText}>{movie.runtime} min</Text>
-                    <Text style={styles.metaDot}>•</Text>
-                    <Text style={[styles.metaText, { color: '#FFD700' }]}>
-                        ★ {movie.vote_average.toFixed(1)}
-                    </Text>
-                </View>
-
-                <Text style={styles.movieDesc} numberOfLines={3}>
-                    Description here
+                <Text style={styles.movieTitle} numberOfLines={2}>
+                    {movie.title}
                 </Text>
 
-                <View style={styles.genreTags}>
-                    {movie.genres.map((g: { id: number; name: string }) => (
-                        <View key={g.id} style={styles.genreTag}>
-                            <Text style={styles.genreTagText}>{g.name}</Text>
-                        </View>
-                    ))}
+                <View style={styles.movieMeta}>
+                    <Text style={styles.metaText}>
+                        {movie.release_date ? movie.release_date.slice(0, 4) : 'N/A'}
+                    </Text>
+                    {movie.runtime > 0 && (
+                        <>
+                            <Text style={styles.metaDot}>•</Text>
+                            <Text style={styles.metaText}>{movie.runtime} min</Text>
+                        </>
+                    )}
+                    {movie.vote_average > 0 && (
+                        <>
+                            <Text style={styles.metaDot}>•</Text>
+                            <Text style={[styles.metaText, { color: '#facc15' }]}>
+                                ★ {movie.vote_average.toFixed(1)}
+                            </Text>
+                        </>
+                    )}
                 </View>
 
-                <View style={styles.platformContainer}>
-                    <Text style={styles.platformLabel}>Available on:</Text>
-                    <View style={styles.platformList}>
-                        <View style={styles.platformTag}>
-                            <Text style={styles.platformText}>Netflix</Text>
-                        </View>
-                        <View style={styles.platformTag}>
-                            <Text style={styles.platformText}>Hulu</Text>
-                        </View>
+                {movie.genres && movie.genres.length > 0 && (
+                    <View style={styles.genreTags}>
+                        {movie.genres.slice(0, 3).map((g: { id: number; name: string }) => (
+                            <View key={g.id} style={styles.genreTag}>
+                                <Text style={styles.genreTagText}>{g.name}</Text>
+                            </View>
+                        ))}
                     </View>
-                </View>
+                )}
             </View>
-        </View>
+        </TouchableOpacity>
     );
 }
 
 const styles = StyleSheet.create({
     movieCard: {
-        backgroundColor: '#0a0a1a',
-        borderRadius: 16,
+        backgroundColor: '#ffffff10',
+        borderRadius: 12,
         overflow: 'hidden',
-        marginBottom: 24,
+        marginBottom: 12,
+        borderWidth: 1,
+        borderColor: '#ffffff20',
+    },
+    imageContainer: {
+        position: 'relative',
+        width: '100%',
+        height: 160,
     },
     movieImage: {
         width: '100%',
-        height: '56%',
+        height: '100%',
+    },
+    placeholderImage: {
+        backgroundColor: '#1a1a1a',
     },
     imageOverlay: {
         ...StyleSheet.absoluteFillObject,
-        backgroundColor: 'rgba(0,0,0,0.3)',
-    },
-    matchBadge: {
-        position: 'absolute',
-        top: 8,
-        left: 8,
-        backgroundColor: 'rgba(0,0,0,0.5)',
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 12,
-    },
-    matchText: {
-        color: '#fff',
-        fontSize: 10,
+        backgroundColor: 'rgba(0,0,0,0.2)',
     },
     iconButton: {
         position: 'absolute',
-        top: 8,
+        top: 12,
+        right: 12,
         width: 36,
         height: 36,
         borderRadius: 18,
-        backgroundColor: 'rgba(0,0,0,0.5)',
+        backgroundColor: 'rgba(0,0,0,0.6)',
         alignItems: 'center',
         justifyContent: 'center',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
     },
     infoContainer: {
         padding: 12,
     },
     movieTitle: {
-        fontSize: 18,
-        fontWeight: '600',
-        color: '#fff',
-        marginBottom: 4,
+        fontSize: 16,
+        fontWeight: '700',
+        color: '#ffffff',
+        marginBottom: 6,
+        lineHeight: 20,
     },
     movieMeta: {
         flexDirection: 'row',
         alignItems: 'center',
         marginBottom: 8,
+        flexWrap: 'wrap',
     },
     metaText: {
-        color: '#aaa',
+        color: '#ffffff',
         fontSize: 12,
+        fontWeight: '500',
     },
     metaDot: {
-        color: '#666',
+        color: '#ffffff60',
         marginHorizontal: 4,
-    },
-    movieDesc: {
-        color: '#bbb',
-        fontSize: 13,
-        lineHeight: 18,
-        marginBottom: 8,
+        fontSize: 12,
     },
     genreTags: {
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 6,
-        marginBottom: 8,
     },
     genreTag: {
-        backgroundColor: '#2a2a4a',
-        borderRadius: 12,
+        backgroundColor: '#818cf8',
+        borderRadius: 10,
         paddingHorizontal: 8,
         paddingVertical: 4,
     },
     genreTagText: {
-        color: '#ccc',
-        fontSize: 11,
-    },
-    platformContainer: {
-        marginTop: 4,
-    },
-    platformLabel: {
-        color: '#888',
-        fontSize: 11,
-        marginBottom: 4,
-    },
-    platformList: {
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        gap: 6,
-    },
-    platformTag: {
-        backgroundColor: '#1a1a2e',
-        borderRadius: 6,
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-    },
-    platformText: {
-        color: '#ccc',
-        fontSize: 11,
+        color: '#ffffff',
+        fontSize: 10,
+        fontWeight: '600',
     },
 });
