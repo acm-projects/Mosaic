@@ -13,6 +13,15 @@ export type FirestoreUser = {
     mood: Map<string, string>;
 }
 
+export type FirestoreGroup = {
+    group_name: string;
+    join_code: string;
+    members: string[];
+    createdAt: string;
+    group_icon: string;
+    uid: string;
+}
+
 export type MovieDetails = {
     adult: boolean;
     backdrop_path: string;
