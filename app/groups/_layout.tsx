@@ -3,12 +3,14 @@ import { Stack } from "expo-router";
 export default function RootLayout() {
     return (
         <Stack screenOptions={{
-            contentStyle: { backgroundColor: 'transparent' }
+            contentStyle: { backgroundColor: 'transparent' },
+            headerShown: false,
+            animation: 'fade'
         }}>
-            <Stack.Screen name="index" options={{ headerShown: false }} />
-            <Stack.Screen name="join" options={{ headerShown: false }} />
-            <Stack.Screen name="create" options={{ headerShown: false }} />
-            <Stack.Screen name="invite" options={{ headerShown: false }} />
+            <Stack.Screen name="index" />
+            <Stack.Screen name="join" />
+            <Stack.Screen name="create" />
+            <Stack.Screen name="invite" />
         </Stack>
     );
 }

@@ -7,13 +7,15 @@ export default function RootLayout() {
         <View style={styles.container}>
             <PageBackground />
             <Stack screenOptions={{
-                contentStyle: { backgroundColor: 'transparent' }
+                contentStyle: { backgroundColor: 'transparent' },
+                headerShown: false,
+                animation: 'slide_from_right'
             }}>
-                <Stack.Screen name="home/(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen name="index" options={{ headerShown: false }} />
-                <Stack.Screen name="auth" options={{ headerShown: false }} />
-                <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-                <Stack.Screen name="groups" options={{ headerShown: false }} />
+                <Stack.Screen name="index" />
+                <Stack.Screen name="auth" />
+                <Stack.Screen name="onboarding" />
+                <Stack.Screen name="home/(tabs)" />
+                <Stack.Screen name="groups" />
             </Stack>
         </View>
     );

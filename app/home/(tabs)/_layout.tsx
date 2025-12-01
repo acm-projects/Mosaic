@@ -18,13 +18,14 @@ export default function TabLayout() {
                     fontWeight: '600',
                 },
                 sceneStyle: { backgroundColor: 'transparent' },
+                headerShown: false,
+                animation: 'shift',
             }}
         >
             <Tabs.Screen
                 name="index"
                 options={{
                     title: 'Home',
-                    headerShown: false,
                     tabBarIcon: ({ color }) => <Home size={28} color={color} />,
                 }}
             />
@@ -32,7 +33,6 @@ export default function TabLayout() {
                 name="search"
                 options={{
                     title: 'Search',
-                    headerShown: false,
                     tabBarIcon: ({ color }) => <Search size={28} color={color} />,
                 }}
             />
@@ -40,7 +40,6 @@ export default function TabLayout() {
                 name="profile"
                 options={{
                     title: 'Profile',
-                    headerShown: false,
                     tabBarIcon: ({ color }) => <User size={28} color={color} />,
                 }}
             />

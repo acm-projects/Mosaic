@@ -3,10 +3,12 @@ import { Stack } from "expo-router";
 export default function RootLayout() {
     return (
         <Stack screenOptions={{
-            contentStyle: { backgroundColor: 'transparent' }
+            contentStyle: { backgroundColor: 'transparent' },
+            headerShown: false,
+            animation: 'fade',
         }}>
-            <Stack.Screen name="login" options={{ headerShown: false }} />
-            <Stack.Screen name="signup" options={{ headerShown: false }} />
+            <Stack.Screen name="login" />
+            <Stack.Screen name="signup" />
         </Stack>
     );
 }
