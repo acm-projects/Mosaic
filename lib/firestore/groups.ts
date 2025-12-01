@@ -1,7 +1,8 @@
 import { require_user } from "@/lib/auth";
-import { firestore } from "@/lib/firebase_config";
-import { Result } from "@/lib/types";
-import { addDoc, collection, doc, FirestoreError, getDoc, getDocs, query, runTransaction, setDoc, where } from "firebase/firestore";
+import { firestore, storage } from "@/lib/firebase_config";
+import { FirestoreGroup, Result } from "@/lib/types";
+import { collection, doc, FirestoreError, getDoc, getDocs, query, runTransaction, serverTimestamp, setDoc, where } from "firebase/firestore";
+import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 
 async function generate_join_code(): Promise<string> {
     const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -24,9 +25,27 @@ async function generate_join_code(): Promise<string> {
     }
 }
 
+async function upload_group_icon(group_id: string, image_uri: string): Promise<Result<string>> {
+    try {
+        const response = await fetch(image_uri);
+        const blob = await response.blob();
+
+        const storage_ref = ref(storage, `group_icons/${group_id}.jpg`);
+
+        await uploadBytes(storage_ref, blob);
+
+        const download_url = await getDownloadURL(storage_ref);
+
+        return { ok: true, data: download_url };
+    } catch (error) {
+        console.error("Error uploading group icon:", error);
+        return { ok: false, error: "Failed to upload group icon", code: "upload_failed" };
+    }
+}
+
 export async function create_group(
     group_name: string,
-    selected_color: string
+    group_icon_uri: string
 ): Promise<Result<string>> {
     try {
         const user = require_user();
@@ -34,13 +53,25 @@ export async function create_group(
         const join_code = await generate_join_code();
 
         const groups_ref = collection(firestore, "Groups");
-        const doc_ref = await addDoc(groups_ref, {
-            createdAt: new Date().toISOString(),
+        const doc_ref = doc(groups_ref);
+        await setDoc(doc_ref, {
+            uid: doc_ref.id,
+            createdAt: serverTimestamp(),
             members: [user.uid],
             join_code,
             group_name,
-            selected_color,
+            group_icon: group_icon_uri,
         });
+
+        // let group_icon_url = "";
+        // if (group_icon_uri) {
+        //     const upload_result = await upload_group_icon(doc_ref.id, group_icon_uri);
+        //     if (upload_result.ok) {
+        //         group_icon_url = upload_result.data;
+                
+        //         await setDoc(doc_ref, { group_icon: group_icon_url }, { merge: true });
+        //     }
+        // }
 
         const user_ref = doc(firestore, "Users", user.uid);
         const user_snap = await getDoc(user_ref);
@@ -112,6 +143,29 @@ export async function join_group(join_code: string): Promise<Result<boolean>> {
         });
 
         return { ok: true, data: true };
+    } catch (error) {
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+
+        if (error instanceof FirestoreError) {
+            error_message = error.message;
+            error_code = error.code;
+        }
+
+        return { ok: false, error: error_message, code: error_code }
+    }
+}
+
+export async function get_group(uid: string): Promise<Result<FirestoreGroup>> {
+    try {
+        const group_ref = doc(firestore, "Groups", uid);
+        const group_snap = await getDoc(group_ref);
+
+        if (!group_snap.exists()) {
+            return { ok: false, error: "Group does not exist", code: "no_group" };
+        }
+
+        return { ok: true, data: group_snap.data() as FirestoreGroup };
     } catch (error) {
         let error_code = "unknown";
         let error_message = "An unknown error occurred.";
