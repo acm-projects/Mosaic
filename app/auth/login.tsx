@@ -197,6 +197,7 @@ export default function Login() {
                                 ]}
                                 onPressIn={() => set_pressed_google(true)}
                                 onPressOut={() => set_pressed_google(false)}
+                                onPress={handle_google_sign_in}
                                 activeOpacity={1}
                             >
                                 <GoogleSVG width={20} height={20} style={{ marginRight: 12 }} />
