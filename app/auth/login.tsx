@@ -3,9 +3,10 @@ import AuthButton from "@/components/auth_button";
 import AuthInput from '@/components/auth_input';
 import LoadingPopup from '@/components/loading_popup';
 import MosaicLogo from '@/components/mosaic_logo';
-import { login } from '@/lib/auth';
+import { google_sign_in, login } from '@/lib/auth';
 import { get_user_data } from '@/lib/firestore/users';
 import { base_styles, button_styles, divider_styles, form_styles, theme } from '@/lib/styles';
+import { GoogleSignin, isErrorWithCode, isSuccessResponse, statusCodes } from '@react-native-google-signin/google-signin';
 import { useRouter } from 'expo-router';
 import { MotiText, MotiView } from 'moti';
 import { useEffect, useState } from "react";
@@ -25,9 +26,76 @@ export default function Login() {
     const [error_message, set_error_message] = useState("");
 
     useEffect(() => {
-        router.prefetch("/onboarding/quiz");
-        router.prefetch("/auth/signup");
-    }, []);
+        GoogleSignin.configure({
+            iosClientId: "864963208412-3p6q5v88afp9im550jgl218luldff8b6.apps.googleusercontent.com",
+            webClientId: "864963208412-htfb54ipl5ns8kkaes92iqjm38ukqn4i.apps.googleusercontent.com",
+        });
+    });
+
+    async function handle_google_sign_in(): Promise<void> {
+        set_loading(true);
+        set_error_message("");
+
+        try {
+            await GoogleSignin.hasPlayServices();
+            const response = await GoogleSignin.signIn();
+
+            if (isSuccessResponse(response)) {
+                const { idToken, user } = response.data;
+                const { name, email } = user;
+
+                const result = await google_sign_in(idToken!, name!);
+
+                if (!result.ok) {
+                    set_error_message(result.error);
+                    return;
+                }
+
+                const { user: firebase_user, is_new_user } = result.data;
+
+                if (is_new_user) {
+                    router.navigate("/onboarding/quiz");
+                } else {
+                    const user_data = await get_user_data(firebase_user.uid);
+
+                    if (!user_data.ok) {
+                        set_error_message(user_data.error);
+                        return;
+                    }
+
+                    if (!user_data.data.taken_quiz) {
+                        router.navigate("/onboarding/quiz");
+                    } else {
+                        router.replace("/home");
+                    }
+                }
+            } else {
+                set_error_message("Google sign-in was cancelled.");
+            }
+        } catch (error) {
+            if (isErrorWithCode(error)) {
+                switch (error.code) {
+                    case statusCodes.SIGN_IN_CANCELLED:
+                        set_error_message("Sign-in was cancelled.");
+                        break;
+                    case statusCodes.IN_PROGRESS:
+                        set_error_message("Sign-in is already in progress.");
+                        break;
+                    case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
+                        set_error_message("Play Services not available or outdated.");
+                        break;
+                    default:
+                        set_error_message("Failed to sign in with Google.");
+                        console.error('Google Sign-In Error:', error);
+                }
+            } else {
+                set_error_message("An unexpected error occurred.");
+                console.error('Google Sign-In Error:', error);
+            }
+        } finally {
+            set_loading(false);
+        }
+    }
 
     async function handle_login(): Promise<void> {
         set_error_message("");
@@ -72,8 +140,6 @@ export default function Login() {
     return (
         <SafeAreaView style={base_styles.container}>
             <LoadingPopup visible={loading} />
-
-            {/*<PageBackground />*/}
 
             <View style={[base_styles.center_container, styles.container]}>
                 <MosaicLogo size="lg" />
@@ -184,3 +250,7 @@ const styles = StyleSheet.create({
         fontWeight: "500",
     },
 });
+
+function handle_google_sign_in(id_token: string) {
+    throw new Error('Function not implemented.');
+}
