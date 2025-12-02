@@ -8,7 +8,7 @@ import { MovieDetails } from '@/lib/types';
 import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { LogOut } from 'lucide-react-native';
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function FavoriteMovies() {
     const [rated_count, set_rated_count] = useState(0);
@@ -136,14 +136,6 @@ export default function FavoriteMovies() {
             <View style={styles.mainContent}>
                 {/* Movie Card with Buttons */}
                 {render_movie_card()}
-
-                {/* Instructions */}
-                <View style={styles.instructions}>
-                    <Text style={styles.instructionsText}>✕ Not for me • ↻ Haven't watched • ❤️ Love it</Text>
-                    <TouchableOpacity onPress={handle_finish}>
-                        <Text style={styles.skipForNow}>Skip for now</Text>
-                    </TouchableOpacity>
-                </View>
             </View>
         </View>
     );
@@ -152,7 +144,6 @@ export default function FavoriteMovies() {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        backgroundColor: '#000',
         paddingHorizontal: 24,
         paddingTop: 48,
         paddingBottom: 48,
