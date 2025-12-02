@@ -1,5 +1,6 @@
 import { FirestoreUser, Result } from "@/lib/types";
 import { doc, FirestoreError, getDoc, serverTimestamp, setDoc } from "firebase/firestore";
+import { require_user } from "../auth";
 import { firestore } from "../firebase_config";
 
 export async function get_user_data(uid: string): Promise<Result<FirestoreUser>> {
@@ -90,6 +91,34 @@ export async function update_favorite_movies(uid: string, favorite_movies: numbe
         }, { merge: true });
 
         return { ok: true, data: true };
+    } catch (error: any) {
+        let error_code = "unknown";
+        let error_message = "An unknown error occurred.";
+
+        if (error instanceof FirestoreError) {
+            error_message = error.message;
+            error_code = error.code;
+        }
+
+        return { ok: false, error: error_message, code: error_code }
+    }
+}
+
+export async function update_mood(mood: Record<string, string>) {
+    try {
+        const user = require_user();
+        const user_ref = doc(firestore, "Users", user.uid);
+        const user_snap = await getDoc(user_ref);
+
+        if (user_snap.exists()) {
+            await setDoc(user_ref, {
+                mood,
+            }, { merge: true });
+
+            return { ok: true, data: true };
+        } else {
+            return { ok: false, error: "No such user!", code: "404" };
+        }
     } catch (error: any) {
         let error_code = "unknown";
         let error_message = "An unknown error occurred.";

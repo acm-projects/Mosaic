@@ -4,7 +4,7 @@ import MovieRow from '@/components/movie_row';
 import { Toast, useToast } from '@/components/toast';
 import { require_user } from '@/lib/auth';
 import { get_group } from '@/lib/firestore/groups';
-import { get_user_data } from '@/lib/firestore/users';
+import { get_user_data, update_mood } from '@/lib/firestore/users';
 import { get_movie_by_code } from '@/lib/movies_api';
 import { FirestoreGroup, MovieDetails } from '@/lib/types';
 import { router } from 'expo-router';
@@ -88,6 +88,10 @@ export default function Home() {
     const { toastConfig, showSuccess, showError, hideToast } = useToast();
 
     useEffect(() => {
+        if (router.canDismiss()) router.dismissAll();
+    })
+
+    useEffect(() => {
         async function fetch_movies() {
             const movies_list: MovieDetails[] = [];
             for (let code of codes_to_fetch) {
@@ -129,10 +133,15 @@ export default function Home() {
         fetch_groups();
     }, []);
 
-    function handle_save_mood() {
-        console.log('Mood answers:', mood_answers);
-        showSuccess('Mood preferences saved!');
-        set_show_mood_modal(false);
+    async function handle_save_mood() {
+        const result = await update_mood(mood_answers);
+
+        if (result.ok) {
+            showSuccess('Mood preferences saved!');
+            set_show_mood_modal(false);
+        } else {
+            showError(`Failed to save mood: ${result.error}`);
+        }
     }
 
     return (
