@@ -5,7 +5,7 @@ import { require_user, sign_out } from "@/lib/auth";
 import { add_quiz } from "@/lib/firestore/users";
 import { theme } from "@/lib/styles";
 import { LinearGradient } from "expo-linear-gradient";
-import { router, useNavigation } from "expo-router";
+import { router } from "expo-router";
 import { LogOut } from "lucide-react-native";
 import { MotiText, MotiView } from "moti";
 import React, { useEffect, useState } from "react";
@@ -48,17 +48,9 @@ export default function QuizScreen() {
     const [loading, set_loading] = useState(false);
     const [unlocked_steps, set_unlocked_steps] = useState([1]);
 
-    const navigation = useNavigation();
-
     useEffect(() => {
-        const unsubscribe = navigation.addListener('beforeRemove', (e) => {
-            if (e.data.action.type === 'GO_BACK') {
-                e.preventDefault();
-            }
-        });
-
-        return unsubscribe;
-    }, [navigation]);
+        router.dismissAll();
+    });
 
     function toggle_genre(genre: string) {
         set_selected_genres((prev) =>
